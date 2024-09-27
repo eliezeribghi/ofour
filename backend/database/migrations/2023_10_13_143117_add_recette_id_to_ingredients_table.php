@@ -19,7 +19,6 @@ class AddRecetteIdToIngredientsTable extends Migration
             }
         } else {
             // Optionnel : Si la table 'ingredients' n'existe pas, tu peux la créer ici
-            // Exemple :
             Schema::create('ingredients', function (Blueprint $table) {
                 $table->id();
                 $table->string('nom');
