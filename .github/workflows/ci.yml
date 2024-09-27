@@ -12,11 +12,8 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '18'  # Remplace par la version de Node.js que tu utilises
-    - name: Install dependencies
-      run: |
-        cd frontend
-        npm install  # Installe les dépendances à partir de package.json dans le dossier frontend
+   
     - name: Run tests
       run: |
         cd frontend
-        npm test || echo "No tests to run"   
+        npm test || echo "No tests to run"   # Exécute les tests définis dans le projet
