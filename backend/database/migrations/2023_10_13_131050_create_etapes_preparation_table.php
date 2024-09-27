@@ -14,6 +14,7 @@ class CreateEtapesPreparationTable extends Migration
     // Dans la migration create_etapes_preparation_table.php
 public function up()
 {
+     if (!Schema::hasTable('etapes_preparation')){
     Schema::create('etapes_preparation', function (Blueprint $table) {
         $table->id();
         $table->unsignedBigInteger('recette_id');
@@ -24,7 +25,7 @@ public function up()
         $table->foreign('recette_id')->references('id')->on('recettes');
     });
 }
-
+}
 
     /**
      * Reverse the migrations.
