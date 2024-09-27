@@ -5,18 +5,16 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-with:
-     dotnet-version: '3'
-     cache: true
-     cache-dependency-path: './package-lock.json'
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'  # Remplace par la version de Node.js que tu utilises
-   
-    - name: Run tests
-      run: |
-        cd frontend
-        npm test || echo "No tests to run"   # Exécute les tests définis dans le projet
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        working-directory: ./frontend # Change le répertoire de travail
+        run: npm install
+      - name: Build the project
+        working-directory: ./frontend # Change aussi ici si nécessaire
+        run: npm run build
