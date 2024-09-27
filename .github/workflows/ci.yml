@@ -8,7 +8,7 @@ jobs:
 with:
      dotnet-version: '3'
      cache: true
-     cache-dependency-path: '**/package-lock.json'
+     cache-dependency-path: './package-lock.json'
     steps:
     - uses: actions/checkout@v2
     - name: Set up Node.js
