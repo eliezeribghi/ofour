@@ -176,7 +176,7 @@ Pour tester ces routes, tu peux utiliser **Thunder Client** ou **Postman**.
 
 ### **Contact**
 
-Si tu as des questions ou des suggestions, n'hésite pas à me contacter via [iibgui@gmail.com](mailto:iibgui@gmail.com).
+Si tu as des questions ou des suggestions, n'hésite pas à me contacter via [eliezer.ibghi@gmail.com](mailto:eliezer.ibghi@gmail.com).
 
 ---
 
