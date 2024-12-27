@@ -12,7 +12,7 @@
   // Récupérer toutes les recettes
   async function getAllRecettes() {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/recettes");
+      const response = await fetch(`http://127.0.0.1:8000/api/recettes`);
       if (response.ok) {
         recettes = await response.json();
       } else {

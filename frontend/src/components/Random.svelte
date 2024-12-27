@@ -8,7 +8,7 @@
   // Fonction pour obtenir les données de l'API
   async function getCardData() {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/recettes/");
+      const response = await fetch(`http://127.0.0.1:8000/api/recettes/`);
 
     if (response.ok) {
   recettes = await response.json();

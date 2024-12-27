@@ -1,5 +1,6 @@
 @use "../utils/variables" as vars;
 @use "../utils/mixins";
+@use 'sass:color';
 
 /* -- Styles généraux --  */
 body {
@@ -42,8 +43,8 @@ a {
   text-decoration: none;
 
   &:hover {
-    color: darken(vars.$accent-color, 10%);
-    border-bottom-color: darken(vars.$accent-color, 10%);
+    color: color.adjust(vars.$accent-color, $lightness: -10%);
+    border-bottom-color: color.adjust(vars.$accent-color, $lightness: -10%);
   }
 }
 button {
@@ -55,7 +56,7 @@ button {
   cursor: pointer;
 
   &:hover {
-    background-color: lighten(vars.$accent-color, 10%); // Légère variation au survol
+    background-color: color.adjust(vars.$accent-color, $lightness: 10%);// Légère variation au survol
   }
 }
 

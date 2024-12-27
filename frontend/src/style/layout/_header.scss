@@ -76,8 +76,8 @@ header {
 
   // Logo qui apparaît uniquement sur le menu mobile & tablette
   .menu-logo {
-margin: 2em;
-    max-width: 50%;
+   margin: 5em;
+    max-width: 20%;
     height: auto;// Définissez la hauteur de votre choix
 
   
@@ -160,7 +160,7 @@ margin: 2em;
 
 
     .menu-logo {
-      
+    margin: 1em;
      width: 140px;
       position: absolute; /* Position fixe */
       top: 0; /* Aligner en haut de la page */
