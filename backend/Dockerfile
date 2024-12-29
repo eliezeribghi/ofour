@@ -23,7 +23,7 @@ COPY composer.json .
 RUN composer install --optimize-autoloader --no-dev
 
 # Définit le répertoire de travail
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Copie les fichiers de l'application dans le conteneur
 COPY . .
