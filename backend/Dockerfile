@@ -1,5 +1,5 @@
 # Utilise une image PHP avec les extensions nécessaires
-FROM php:8.2-fpm
+FROM php:8.3-excimer
 
 # Installe les dépendances système
 RUN apt-get update && apt-get install -y \
@@ -14,13 +14,16 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql gd
 
 # Installe Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Définit le répertoire de travail
 WORKDIR /var/www
 
 # Copie les fichiers de l'application dans le conteneur
 COPY . .
+
+# Autorise Composer à s'exécuter avec les privilèges de superutilisateur (pour éviter l'avertissement)
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Installe les dépendances Laravel
 RUN composer install --optimize-autoloader --no-dev
