@@ -20,7 +20,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /var/www
 
 # Copie les fichiers de l'application dans le conteneur
-COPY . .
+COPY . /var/www
+
 
 # Autorise Composer à s'exécuter avec les privilèges de superutilisateur (pour éviter l'avertissement)
 ENV COMPOSER_ALLOW_SUPERUSER=1
