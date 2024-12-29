@@ -14,10 +14,10 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd zip \
-    && pecl install excimer \
-    && docker-php-ext-enable excimer
+    && docker-php-ext-install pdo pdo_mysql gd zip
 
+# Installe Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Définit le répertoire de travail
 WORKDIR /var/www
