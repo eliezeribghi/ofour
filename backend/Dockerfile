@@ -13,13 +13,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    php8.3-excimer \ # Ajout de php8.3-excimer \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd zip
-
-
-
-# Installe les dépendances Laravel
-RUN composer install --optimize-autoloader --no-dev
 
 # Définit le répertoire de travail
 WORKDIR /var/www
