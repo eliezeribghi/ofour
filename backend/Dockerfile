@@ -1,5 +1,5 @@
 # Utilise une image PHP avec les extensions nécessaires
-FROM php:8.3-excimer
+FROM php:8.3-cli
 
 # Installe les dépendances système
 RUN apt-get update && apt-get install -y \
