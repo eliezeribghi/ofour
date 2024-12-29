@@ -1,6 +1,6 @@
 # Utilise une image PHP avec les extensions nécessaires
 FROM php:8.3-cli
-
+RUN composer --version
 # Installe les dépendances système
 RUN apt-get update && apt-get install -y \
     libpng-dev \
@@ -21,6 +21,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Définit le répertoire de travail
 WORKDIR /var/www
+COPY backend/composer.lock .
 
 # Copier le fichier composer.json
 COPY backend/composer.json .
@@ -30,6 +31,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Installe les dépendances Laravel
 RUN composer install --optimize-autoloader --no-dev
+
 
 # Génère l'autoload de Composer
 RUN composer dump-autoload --optimize
