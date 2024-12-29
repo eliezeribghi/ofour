@@ -16,14 +16,17 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd zip
 
-# Copier Composer depuis une image officielle
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+# Copier le fichier composer.json
+COPY composer.json .
+
+# Installe les dépendances Laravel
+RUN composer install --optimize-autoloader --no-dev
 
 # Définit le répertoire de travail
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Copie les fichiers de l'application dans le conteneur
-COPY . /var/www
+COPY . .
 
 # Autorise Composer à s'exécuter avec les privilèges de superutilisateur (pour éviter l'avertissement)
 ENV COMPOSER_ALLOW_SUPERUSER=1
