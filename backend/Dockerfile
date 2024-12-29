@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
 # Installe Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+ENV PATH="$PATH:/usr/local/bin"
 # Vérifie que Composer est installé
 RUN composer --version
 
