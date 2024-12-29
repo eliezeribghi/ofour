@@ -13,9 +13,11 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    php8.3-excimer \ # Ajout de php8.3-excimer \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd zip
+    && docker-php-ext-install pdo pdo_mysql gd zip \
+    && pecl install excimer \
+    && docker-php-ext-enable excimer
+
 
 # Définit le répertoire de travail
 WORKDIR /var/www
