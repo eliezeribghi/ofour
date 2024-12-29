@@ -36,3 +36,7 @@ EXPOSE 9000
 
 # Commande par défaut pour démarrer PHP-FPM
 CMD ["php-fpm"]
+
+
+# Commande par défaut pour démarrer PHP-FPM
+CMD ["php-fpm"]
