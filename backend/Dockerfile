@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y \
 # Installe Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Vérifiez les permissions
+RUN chown -R www-data:www-data /var/www/html
+
 ENV PATH="$PATH:/usr/local/bin"
 # Vérifie que Composer est installé
 RUN composer --version
@@ -34,7 +37,7 @@ COPY backend/composer.lock .
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Installe les dépendances Laravel
-RUN composer install --optimize-autoloader --no-dev
+RUN composer clear-cache && composer install --optimize-autoloader --no-dev
 
 # Donne les permissions nécessaires au dossier de stockage et au cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
