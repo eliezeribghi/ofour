@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
-    libonig-dev \  
+    libonig-dev \
     zip \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -21,12 +21,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Étape 4 : Définir le répertoire de travail
 WORKDIR /var/www
 
-# Étape 5 : Copier les fichiers du projet
-COPY . .
-
-# Étape 6 : Configurer les permissions pour Laravel
-RUN chown -R www-data:www-data /var/www \
+# Étape 5 : Créer le répertoire et configurer les permissions
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Étape 6 : Copier les fichiers du projet
+COPY . .
 
 # Étape 7 : Exposer le port 9000
 EXPOSE 9000
