@@ -17,17 +17,16 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /var/www/html
 
 # Copie les fichiers composer
-COPY composer.json composer.lock ./
+COPY composer.lock ./
 
 # Autorise Composer à s'exécuter avec les privilèges de superutilisateur
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Installe les dépendances Laravel
-RUN composer install --optimize-autoloader --no-dev
-
+RUN composer install --no-dev --no-scripts --no-autoloader
 # Copie le reste des fichiers de l'application
 COPY . .
-
+RUN composer dump-autoload --optimize
 # Donne les permissions nécessaires
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 storage bootstrap/cache
