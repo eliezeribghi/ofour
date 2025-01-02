@@ -1,38 +1,40 @@
-FROM webdevops/php-nginx:8.3-alpine
+# Étape 1 : Utiliser une image officielle PHP pour Laravel avec PHP-FPM
+FROM php:8.2-fpm
 
-# Installation dans votre Image du minimum pour que Docker fonctionne
-RUN apk add oniguruma-dev libxml2-dev
-RUN docker-php-ext-install \
-        bcmath \
-        ctype \
-        fileinfo \
-        mbstring \
-        pdo_mysql \
-        xml
+# Étape 2 : Installer les extensions PHP nécessaires pour Laravel
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
 
-# Installation dans votre image de Composer
+# Étape 3 : Installer Composer (gestionnaire de dépendances PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Étape 4 : Définir le répertoire de travail
+WORKDIR /var/www
 
-ENV WEB_DOCUMENT_ROOT /app/public
-ENV APP_ENV production
-WORKDIR /app
+# Étape 5 : Copier les fichiers nécessaires
 COPY . .
 
-# On copie le fichier .env.example pour le renommer en .env
-# Vous pouvez modifier le .env.example pour indiquer la configuration de votre site pour la production
-RUN cp -n .env.example .env
+# Étape 6 : Donner les permissions au répertoire storage et bootstrap/cache
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Installation et configuration de votre site pour la production
-# https://laravel.com/docs/10.x/deployment#optimizing-configuration-loading
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-# Generate security key
-RUN php artisan key:generate
-# Optimizing Configuration loading
-RUN php artisan config:cache
-# Optimizing Route loading
-RUN php artisan route:cache
-# Optimizing View loading
-RUN php artisan view:cache
+# Étape 7 : Optimiser Laravel pour la production (facultatif)
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
+# Étape 8 : Exposer le port pour PHP-FPM
+EXPOSE 9000
+
+# Commande par défaut pour démarrer PHP-FPM
+CMD ["php-fpm"]
 

@@ -13,7 +13,7 @@
         "laravel/tinker": "^2.5"
     },
     "require-dev": {
-        
+
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
@@ -34,6 +34,11 @@
         }
     },
     "scripts": {
+        "post-install-cmd": [
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
