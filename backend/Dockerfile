@@ -1,5 +1,5 @@
 # Utilise une image PHP avec les extensions nécessaires
-FROM php:8.3-cli
+FROM php:8.2-cli
 
 # Installe les dépendances système
 RUN apt-get update && apt-get install -y \
@@ -46,4 +46,4 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 EXPOSE 9000
 
 # Commande par défaut pour démarrer PHP-FPM
-CMD ["php-fpm"]
+CMD ["php"]
