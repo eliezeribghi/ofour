@@ -1,5 +1,8 @@
 FROM php:8.2-cli
 
+# Affiche le contenu du répertoire
+RUN ls -la
+
 # Installe les dépendances système
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev \
