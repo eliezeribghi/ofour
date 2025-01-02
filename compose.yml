@@ -34,7 +34,13 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
+  composer:
+    image: composer:latest
+    container_name: composer-installer
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["composer", "install"]
   db:
     image: mysql:8.0
     container_name: my-mysql

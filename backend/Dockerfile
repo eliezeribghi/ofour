@@ -13,11 +13,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Définit le répertoire de travail
 WORKDIR /var/www/html
 
-# Copie tous les fichiers de l'application
-COPY . .
-
-# Donne les permissions nécessaires
-RUN chown -R www-data:www-data /var/www/html
+# Copie les fichiers composer
+COPY composer.json composer.lock ./
 
 # Autorise Composer à s'exécuter avec les privilèges de superutilisateur
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -25,8 +22,12 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Installe les dépendances Laravel
 RUN composer install --optimize-autoloader --no-dev
 
-# Donne les permissions nécessaires au dossier de stockage et au cache
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Copie le reste des fichiers de l'application
+COPY . .
+
+# Donne les permissions nécessaires
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 storage bootstrap/cache
 
 # Commande par défaut pour démarrer l'application
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
