@@ -25,8 +25,10 @@ COPY . /var/www
 # Étape 5 : Copier la configuration de Nginx
 COPY ./backend/nginx.conf /etc/nginx/sites-available/default
 
-# Étape 6 : Donner les bonnes permissions pour les fichiers Laravel
-RUN chown -R www-data:www-data /var/www && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Étape 6 : Créer les répertoires et donner les bonnes permissions pour les fichiers Laravel
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
+    chown -R www-data:www-data /var/www && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Étape 7 : Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
