@@ -1,37 +1,28 @@
-FROM php:8.2-cli
+FROM webdevops/php-nginx:8.3-alpine
 
-# Installe les dépendances système
-RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev \
-    zlib1g-dev libzip-dev zip unzip git curl \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd zip
+RUN apk add oniguruma-dev libxml2-dev
+RUN docker-php-ext-install \
+        bcmath \
+        ctype \
+        fileinfo \
+        mbstring \
+        pdo_mysql \
+        xml
 
-    RUN chown -R www-data:www-data /var/www/html
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Installe Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ENV WEB_DOCUMENT_ROOT /app/public
+ENV APP_ENV production
+WORKDIR /app
 
-COPY . /var/www/html
-COPY composer.json composer.lock /var/www/html/
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# Définit le répertoire de travail
-WORKDIR /var/www/html
-
-# Copie tous les fichiers de l'application
 COPY . .
 
-# Donne les permissions nécessaires
-RUN chown -R www-data:www-data /var/www/html
+RUN cp -n .env.example .env
+RUN php artisan key:generate
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
-# Autorise Composer à s'exécuter avec les privilèges de superutilisateur
-ENV COMPOSER_ALLOW_SUPERUSER=1
-
-# Installe les dépendances Laravel
-RUN composer install --optimize-autoloader --no-dev
-
-# Donne les permissions nécessaires au dossier de stockage et au cache
-RUN chown -R www-data:www-data storage bootstrap/cache
-
-# Commande par défaut pour démarrer l'application
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
