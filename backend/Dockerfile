@@ -25,6 +25,7 @@ RUN chmod -R 755 /var/www
 # Vérifier les fichiers dans /var/www pour déboguer
 RUN ls -al /var/www
 RUN ls -al /
+
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
