@@ -26,7 +26,7 @@ COPY ./backend /var/www
 COPY ./backend/nginx.conf /etc/nginx/nginx.conf
 
 # Copier le script d'entrée
-COPY entrypoint.sh /usr/bin/entrypoint.sh
+COPY ./backend/entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 # Créer les répertoires nécessaires pour Laravel et définir les bonnes permissions
