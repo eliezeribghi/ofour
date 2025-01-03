@@ -16,19 +16,21 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-     - "8080:8080"  # Le backend est accessible via http://localhost:8080
+     - "${PORT}:${PORT}"  # Le backend est accessible via http://localhost:8080
  
     depends_on:
       - db  # Le backend dépend de la base de données
     networks:
       - app_network
-    environment:
+     environment:
+      PORT: 8080
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: ofour
       DB_USERNAME: root
       DB_PASSWORD: root
+      
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
