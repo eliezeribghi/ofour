@@ -17,13 +17,19 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
 
 # Copier les fichiers du projet dans le conteneur
-COPY ./backend /backend
+COPY ./backend /var/www
 
 # Donner les bonnes permissions sur le répertoire backend
-RUN chmod -R 755 /backend
+RUN chmod -R 755 /var/www
+
+# Vérifier les fichiers dans /var/www
+RUN ls -al /var/www
 
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Installer les dépendances PHP avec Composer
+RUN cd /var/www && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Copier la configuration Nginx (modèle)
 COPY ./backend/nginx.conf /etc/nginx/nginx.conf
@@ -36,9 +42,6 @@ RUN chmod +x /usr/bin/entrypoint.sh
 RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
     chown -R www-data:www-data /var/www && \
     chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# Installer les dépendances PHP avec Composer
-RUN cd /var/www && composer install --no-dev --optimize-autoloader
 
 # Définir le port par défaut à 10000
 ENV PORT=10000
