@@ -1,7 +1,7 @@
-# Étape 1 : Utiliser une image PHP avec FPM
+# Utiliser l'image PHP avec Nginx
 FROM php:8.2-fpm
 
-# Étape 2 : Installer Nginx et les dépendances nécessaires
+# Installer Nginx et d'autres dépendances nécessaires
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -16,26 +16,32 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
 
-# Étape 3 : Installer Composer
+# Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Étape 4 : Copier les fichiers du projet dans le conteneur
+# Copier les fichiers du projet dans le conteneur
 COPY ./backend /var/www
 
-# Étape 5 : Copier la configuration de Nginx
-COPY ./backend/nginx.conf /etc/nginx/nginx.conf
+# Copier la configuration Nginx (modèle)
+COPY ./backend/nginx.conf.template /etc/nginx/nginx.conf.template
 
-# Étape 6 : Ajuster les permissions
+# Copier le script d'entrée
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+# Créer les répertoires nécessaires pour Laravel et définir les bonnes permissions
 RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
     chown -R www-data:www-data /var/www && \
     chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Étape 7 : Installer les dépendances PHP avec Composer
-WORKDIR /var/www
-RUN composer install --no-dev --optimize-autoloader
+# Installer les dépendances PHP avec Composer
+RUN cd /var/www && composer install --no-dev --optimize-autoloader
 
-# Étape 8 : Exposer le port défini
-EXPOSE 10000
+# Définir le port par défaut à 10000
+ENV PORT=10000
 
-# Étape 9 : Démarrer Nginx et PHP-FPM
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+# Définir le point d'entrée pour démarrer le serveur
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+
+# Démarrer Nginx et PHP-FPM
+CMD ["service", "nginx", "start", "&&", "php-fpm"]
