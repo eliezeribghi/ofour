@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
 
 # Copier les fichiers du projet dans le conteneur
-COPY ./backend/ /var/www
+COPY ./backend /var/www
 
 # Donner les bonnes permissions sur le répertoire backend
 RUN chmod -R 755 /var/www
