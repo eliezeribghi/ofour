@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Étape 4 : Copier les fichiers du projet dans le conteneur
-COPY . /var/www
+COPY ./backend /var/www
 
 # Étape 5 : Copier la configuration de Nginx
 COPY ./backend/nginx.conf /etc/nginx/sites-available/default
@@ -34,7 +34,7 @@ RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Étape 8 : Installer les dépendances PHP avec Composer
-RUN cd /var/www && composer install --no-dev --optimize-autoloader
+RUN cd  /var/www && composer install --no-dev --optimize-autoloader
 
 
 # Étape 9 : Démarrer Nginx et PHP-FPM
