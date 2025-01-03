@@ -36,6 +36,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Étape 8 : Installer les dépendances PHP avec Composer
 RUN cd  /var/www && composer install --no-dev --optimize-autoloader
 
+ENV PORT=10000
 
 # Étape 9 : Démarrer Nginx et PHP-FPM
 CMD service nginx start && php-fpm
