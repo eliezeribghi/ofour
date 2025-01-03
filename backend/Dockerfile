@@ -23,7 +23,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY ./backend /var/www
 
 # Copier la configuration Nginx (modèle)
-COPY ./backend/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY ./backend/nginx.conf /etc/nginx/nginx.conf
 
 # Copier le script d'entrée
 COPY entrypoint.sh /usr/bin/entrypoint.sh
