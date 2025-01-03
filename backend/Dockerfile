@@ -16,15 +16,14 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
 
+# Copier les fichiers du projet dans le conteneur
+COPY ./backend /backend
 
-
+# Donner les bonnes permissions sur le répertoire backend
 RUN chmod -R 755 /backend
 
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Copier les fichiers du projet dans le conteneur
-COPY ./backend /var/www
 
 # Copier la configuration Nginx (modèle)
 COPY ./backend/nginx.conf /etc/nginx/nginx.conf
@@ -47,5 +46,4 @@ ENV PORT=10000
 # Définir le point d'entrée pour démarrer le serveur
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
-# Démarrer Nginx et PHP-FPM
-CMD ["service", "nginx", "start", "&&", "php-fpm"]
+# Ne pas inclure la commande CMD ici, car elle est déjà dans entrypoint.sh
