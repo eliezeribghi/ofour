@@ -22,7 +22,7 @@ COPY ./backend /var/www
 # Donner les bonnes permissions sur le répertoire backend
 RUN chmod -R 755 /var/www
 
-# Vérifier les fichiers dans /var/www
+# Vérifier les fichiers dans /var/www pour déboguer
 RUN ls -al /var/www
 
 # Installer Composer
