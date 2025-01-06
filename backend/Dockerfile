@@ -21,7 +21,7 @@ RUN ls -al /var/www
 RUN ls -al /
 WORKDIR /var/www
 # Copier les fichiers du projet dans le conteneur
-COPY ./ofour/backend /var/www
+COPY . /var/www
 
 # Donner les bonnes permissions sur le répertoire backend
 RUN chmod -R 755 /var/www
