@@ -41,9 +41,9 @@ services:
   composer:
     image: composer:latest
     container_name: composer-installer
-    working_dir: /app
+    working_dir: /var/www/backend 
     volumes:
-      - .:/app
+     - ./backend:/var/www/backend
     command: ["composer", "install"]
   db:
     image: mysql:8.0
