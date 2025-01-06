@@ -14,11 +14,14 @@ RUN apt-get update && apt-get install -y \
     zip \
     curl \
     lsb-release \
+    gnupg2 \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache \
     # Ajouter le dépôt PHP (pour s'assurer que PHP 8.2 est disponible)
     && echo "deb http://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
+    # Télécharger et ajouter la clé GPG pour le dépôt
     && curl -fsSL https://packages.sury.org/php/apt.gpg | tee /etc/apt/trusted.gpg.d/sury-php.asc \
+    # Mettre à jour les dépôts et installer PHP 8.2
     && apt-get update \
     && apt-get install -y php8.2-fpm \
     # Nettoyage des caches pour réduire la taille de l'image
@@ -61,4 +64,5 @@ ENV PORT=10000
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
 # N'oublie pas que la commande CMD n'est pas nécessaire ici, car elle est dans entrypoint.sh
+
 
