@@ -35,10 +35,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN cd /var/www && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Copier la configuration Nginx (modèle)
-COPY ./backend/nginx.conf /etc/nginx/nginx.conf
+COPY /nginx.conf /etc/nginx/nginx.conf
 
 # Copier le script d'entrée
-COPY ./backend/entrypoint.sh /usr/bin/entrypoint.sh
+COPY /entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 # Créer les répertoires nécessaires pour Laravel et définir les bonnes permissions
