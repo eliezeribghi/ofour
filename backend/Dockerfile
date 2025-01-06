@@ -42,6 +42,9 @@ COPY ./backend/nginx.conf /etc/nginx/nginx.conf
 COPY ./backend/entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
+
+RUN apt-get update && apt-get install -y php8.2-fpm
+
 # Créer les répertoires nécessaires pour Laravel et définir les bonnes permissions
 RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
     chown -R www-data:www-data /var/www && \
