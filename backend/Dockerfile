@@ -15,10 +15,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
-    
+
 # Vérifier les fichiers dans /var/www pour déboguer
 RUN ls -al /var/www
 RUN ls -al /
+WORKDIR /var/www
 # Copier les fichiers du projet dans le conteneur
 COPY ./backend /var/www
 
