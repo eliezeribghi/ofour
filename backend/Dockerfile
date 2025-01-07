@@ -9,13 +9,22 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
-    libonig-dev \
     zip \
+    libonig-dev \
+    php7.4-cli \
+    php7.4-mysql \
+    php7.4-gd \
+    php7.4-intl \
+    php7.4-xml \
+    php7.4-zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache
+    && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 
+RUN add-apt-repository ppa:ondrej/php -y && \
+    apt-get update
 
 RUN apt-get update && apt-get install -y \
     ... \
