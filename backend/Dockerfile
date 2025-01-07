@@ -79,7 +79,7 @@ FROM php:8.3-apache
 ARG WWW_USER=1000
 
 # Set working directory
-WORKDIR /backend/app
+WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
