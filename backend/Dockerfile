@@ -73,8 +73,7 @@
 # ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
 # # N'oublie pas que la commande CMD n'est pas nécessaire ici, car elle est dans entrypoint.sh
-
-FROM php:8.3-apache
+FROM php:8.3-fpm
 
 ARG WWW_USER=1000
 
@@ -100,8 +99,6 @@ RUN apt-get update && apt-get install -y \
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip curl intl
-
-
 
 # Get latest Composer
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
