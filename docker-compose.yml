@@ -10,6 +10,21 @@ services:
       - backend  # Le frontend dépend du backend
     networks:
       - app_network
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./frontend:/app  # Serve les fichiers statiques du frontend
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Le fichier de configuration Nginx
+      - ./nginx/ssl:/etc/nginx/ssl  # Volume pour les certificats SSL
+    ports:
+      - "80:80"
+      - "443:443"  # Activer le port HTTPS
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app_network
 
   backend:
     build:
@@ -18,7 +33,7 @@ services:
     volumes:
       - ./backend:/var/www 
     ports:
-     - "${PORT}:${PORT}"  # Le backend est accessible via http://localhost:8080
+     -   "${PORT:-8080}:8080"  # Le backend est accessible via http://localhost:8080
  
     depends_on:
       - db  # Le backend dépend de la base de données
