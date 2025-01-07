@@ -3,6 +3,7 @@ FROM php:8.2-fpm
 
 # Installer les dépendances nécessaires (Nginx, Composer, PHP extensions)
 RUN apt-get update && apt-get install -y \
+    gnupg2 \
     nginx \
     git \
     unzip \
@@ -16,12 +17,11 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache \
-    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
-    && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/sury-php.gpg > /dev/null \
+    && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury-php.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
     && apt-get update \
     && apt-get install -y php8.2-fpm \
     && rm -rf /var/lib/apt/lists/*
-
 
 
 # Vérifier les fichiers dans /var/www pour déboguer
