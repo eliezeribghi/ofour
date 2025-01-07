@@ -102,15 +102,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip curl intl
 
 
-# Enable Apache mods
-RUN a2enmod rewrite
 
 # Get latest Composer
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
-
-# Create user
-RUN groupadd --force -g $WWW_USER webapp
-RUN useradd -ms /bin/bash --no-user-group -g $WWW_USER -u $WWW_USER webapp
 
 # Clean cache
 RUN apt-get -y autoremove \
