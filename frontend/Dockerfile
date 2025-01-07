@@ -1,24 +1,26 @@
-# Étape 1 : Construction avec une version récente de Node.js
-FROM node:18-alpine AS build
+# Étape 1 : Construction de l'application frontend
+FROM node:16 AS build
 
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires pour installer les dépendances
-COPY package*.json pnpm-lock.yaml ./
+# Copier le package.json et le package-lock.json
+COPY frontend/package*.json ./
 
-# Installer PNPM et les dépendances
-RUN npm install -g pnpm && pnpm install
+# Installer les dépendances
+RUN npm install
 
-# Copier tout le projet et construire l'application
-COPY . .
-RUN pnpm run build
+# Copier tous les fichiers sources de l'application frontend
+COPY frontend/ ./
+
+# Construire l'application
+RUN npm run build
 
 # Étape 2 : Serveur Nginx pour servir les fichiers statiques
 FROM nginx:alpine
 
-# Copier les fichiers générés dans "dist" vers Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copier les fichiers de build de la première étape
+COPY --from=build /app/public /usr/share/nginx/html
 
+# Exposer le port 80 pour accéder au frontend
 EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;" ]

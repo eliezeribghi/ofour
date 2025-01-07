@@ -73,40 +73,28 @@
 # ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
 # # N'oublie pas que la commande CMD n'est pas nécessaire ici, car elle est dans entrypoint.sh
-FROM php:8.3-fpm
+# Étape 1 : Installer PHP et les extensions nécessaires
+FROM php:8.0-fpm
 
-ARG WWW_USER=1000
+# Installer les extensions PHP nécessaires pour Laravel
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install gd pdo pdo_mysql
 
-# Set working directory
-WORKDIR /app
+# Installer Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    libpq-dev \
-    libzip-dev \
-    libcurl4-openssl-dev \
-    zip \
-    unzip \
-    default-mysql-client
+# Définir le répertoire de travail
+WORKDIR /var/www
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip curl intl
+# Copier les fichiers de l'application Laravel dans le conteneur
+COPY backend/ ./
 
-COPY ./backend/nginx.conf /etc/nginx/nginx.conf
-# Get latest Composer
-RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+# Installer les dépendances Laravel
+RUN composer install
 
-# Clean cache
-RUN apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Exposer le port 8080 pour accéder au backend
+EXPOSE 8080
 
-USER ${WWW_USER}
+# Commande par défaut pour démarrer le serveur PHP-FPM
+CMD ["php-fpm"]
