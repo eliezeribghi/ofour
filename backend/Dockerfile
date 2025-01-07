@@ -101,8 +101,6 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip curl intl
 
-# Copy vhost config
-COPY ./backend/vhost.conf /etc/apache2/sites-available/000-default.conf
 
 # Enable Apache mods
 RUN a2enmod rewrite
