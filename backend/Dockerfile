@@ -16,13 +16,12 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd mbstring zip opcache \
-    # Ajouter le dépôt PHP (pour s'assurer que PHP 8.2 est disponible)
-    && echo "deb http://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
-    && curl -fsSL https://packages.sury.org/php/apt.gpg | tee /etc/apt/trusted.gpg.d/sury-php.asc \
+    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
+    && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/sury-php.gpg > /dev/null \
     && apt-get update \
     && apt-get install -y php8.2-fpm \
-    # Nettoyage des caches pour réduire la taille de l'image
     && rm -rf /var/lib/apt/lists/*
+
 
 
 # Vérifier les fichiers dans /var/www pour déboguer
