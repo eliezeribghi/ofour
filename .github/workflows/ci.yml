@@ -11,7 +11,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}  # Assure-toi que ce secret est configuré dans GitHub
           MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
           MYSQL_USER: ${{ secrets.DB_USERNAME }}
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
