@@ -3,7 +3,9 @@ FROM node:18 AS build
 WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
-COPY frontend/ ./
+COPY frontend/index.html /app/index.html
+
+COPY . .
 RUN npm run build
 
 # Étape 2 : Copier les fichiers de build dans une image Nginx
