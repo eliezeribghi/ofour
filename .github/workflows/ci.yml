@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ubuntu-latest] 
     steps:
       # Étape 1: Vérifier le code du dépôt
       - name: Checkout repository
