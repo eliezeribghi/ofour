@@ -11,7 +11,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-           MYSQL_ROOT_PASSWORD: root  # Mot de passe pour l'utilisateur root
+           MYSQL_ROOT_PASSWORD: eliezeribghi  # Mot de passe pour l'utilisateur root
            MYSQL_DATABASE: ofour      # Nom de la base de données à créer
            MYSQL_USER: user           # Utilisateur MySQL
            MYSQL_PASSWORD: user       # Mot de passe de l'utilisateur
