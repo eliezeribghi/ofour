@@ -74,7 +74,7 @@
 
 # # N'oublie pas que la commande CMD n'est pas nécessaire ici, car elle est dans entrypoint.sh
 # Étape 1 : Installer PHP et les extensions nécessaires
-FROM php:8.0-fpm
+FROM php:8.2-fpm
 
 # Installer les extensions PHP nécessaires pour Laravel
 RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip git
