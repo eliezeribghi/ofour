@@ -61,8 +61,8 @@ services:
     command: ["composer", "install"]
 
   db:
-    image: mysql:5.7  # Assurez-vous de spécifier l'image 5.7 pour être cohérent avec l'exemple précédent
-    container_name: my-mysql
+    image: mariadb:10.5
+    container_name: my-mariadb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root  # Mot de passe pour l'utilisateur root
@@ -79,7 +79,7 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
 
 networks:
