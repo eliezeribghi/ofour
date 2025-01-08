@@ -11,27 +11,15 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}  # Assure-toi que ce secret est configuré dans GitHub
-          MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
-          MYSQL_USER: ${{ secrets.DB_USERNAME }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+           MYSQL_ROOT_PASSWORD: root  # Mot de passe pour l'utilisateur root
+           MYSQL_DATABASE: ofour      # Nom de la base de données à créer
+           MYSQL_USER: user           # Utilisateur MySQL
+           MYSQL_PASSWORD: user       # Mot de passe de l'utilisateur
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
-      - name: Display secrets
-        run: |
-           echo "MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}"
-           echo "DB_DATABASE: ${{ secrets.DB_DATABASE }}"
-           echo "DB_USERNAME: ${{ secrets.DB_USERNAME }}"
-           echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}"
-        env:
-             MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-             DB_DATABASE: ${{ secrets.DB_DATABASE }}
-             DB_USERNAME: ${{ secrets.DB_USERNAME }}
-             DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
       # Étape 1: Vérifier le code du dépôt
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -62,16 +50,16 @@ jobs:
       # Étape 6: Attendre que MySQL soit prêt
       - name: Wait for MySQL to be ready
         run: |
-          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+          while ! mysqladmin ping -h"mysql" --silent; do
             echo "Waiting for MySQL..."
             sleep 2
           done
-      
+
       # Étape 7: Vérifier la connexion à MySQL
       - name: Check MySQL connection
         run: |
           echo "Checking MySQL connection..."
-          mysql -h 127.0.0.1 -u ${{ secrets.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} -e 'SHOW DATABASES;'
+          mysql -h mysql -u ${{ secrets.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} -e 'SHOW DATABASES;'
 
       # Étape 8: Exécuter les migrations de la base de données
       - name: Run database migrations
