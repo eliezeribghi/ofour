@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\URL;
 use App\Models\EtapePreparation;
 use App\Models\RecetteIngredient;
 use App\Models\Categorie;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Recette extends Model
 {
+    use HasFactory;
     // Nom de la table dans la base de données associée à ce modèle
     protected $table = 'recettes';
 
@@ -44,7 +45,7 @@ public function etapesPreparation()
     public function categorie()
     {
         return $this->belongsTo(Categorie::class);
-    } 
+    }
 
 }
 
