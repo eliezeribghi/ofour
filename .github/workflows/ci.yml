@@ -10,10 +10,10 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}  # Utilisation du secret pour le mot de passe root
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}  # Nom de la base de données depuis les secrets
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}  # Utilisation d'un secret pour l'utilisateur
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}  # Mot de passe de l'utilisateur depuis les secrets
+          MYSQL_ROOT_PASSWORD: ${{ secrets.BD_PASSWORD }}  # Utilisation du secret pour le mot de passe root
+          MYSQL_DATABASE: ${{ secrets.BD_DATABASE }}  # Nom de la base de données depuis les secrets
+          MYSQL_USER: ${{ secrets.BD_USER }}  # Utilisation d'un secret pour l'utilisateur
+          MYSQL_PASSWORD: ${{ secrets.BD_PASSWORD }}  # Mot de passe de l'utilisateur depuis les secrets
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
