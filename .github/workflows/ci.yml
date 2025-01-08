@@ -5,6 +5,19 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       # Étape 1: Vérifier le code du dépôt
       - name: Checkout repository
@@ -33,7 +46,27 @@ jobs:
         working-directory: ./backend
         run: php artisan key:generate
 
-      # Étape 6: Lancer les tests
+      # Étape 6: Attendre que la base de données soit prête
+      - name: Wait for MySQL to be ready
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+
+      # Étape 7: Exécuter les migrations de la base de données
+      - name: Run database migrations
+        working-directory: ./backend
+        run: php artisan migrate --env=testing
+
+      # Étape 8: Lancer les tests
       - name: Run tests
         working-directory: ./backend
         run: php artisan test --no-interaction
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: ofour
+          DB_USERNAME: user
+          DB_PASSWORD: user
