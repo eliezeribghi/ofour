@@ -6,15 +6,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Étape 1: Vérifier le code du dépôt
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Setup Node.js
+
+      # Étape 2: Configurer Node.js pour le frontend
+      - name: Setup Node.js (Frontend)
         uses: actions/setup-node@v2
         with:
           node-version: '18'
-      - name: Install dependencies
-        working-directory: ./frontend # Change le répertoire de travail
+
+      # Étape 3: Installer les dépendances du frontend
+      - name: Install frontend dependencies
+        working-directory: ./frontend # Dossier du frontend
         run: npm install
-      - name: Build the project
-        working-directory: ./frontend # Change aussi ici si nécessaire
+
+      # Étape 4: Construire le frontend
+      - name: Build frontend
+        working-directory: ./frontend
         run: npm run build
+
+      # Étape 5: Configurer Node.js pour le backend (si nécessaire, répéter pour backend)
+      - name: Setup Node.js (Backend)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      # Étape 6: Installer les dépendances du backend
+      - name: Install backend dependencies
+        working-directory: ./backend # Dossier du backend
+        run: npm install
+
+      # Étape 7: (Optionnel) Construire ou tester le backend
+      - name: Build or Test backend
+        working-directory: ./backend
+        run: npm run build # Ou `npm test` si vous avez des tests pour le backend
