@@ -62,8 +62,10 @@ services:
     container_name: my-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Utiliser un secret de mot de passe pour root
-      MYSQL_DATABASE: ${MYSQL_DATABASE}  # Utiliser une variable d'environnement pour la base de données
+     MYSQL_ROOT_PASSWORD: root  # Ajoute cette ligne avec ton mot de passe root
+     MYSQL_DATABASE: ofour      # Nom de la base de données à créer
+     MYSQL_USER: user           # Nom d'utilisateur pour accéder à la DB
+     MYSQL_PASSWORD: user  # Utiliser une variable d'environnement pour la base de données
     ports:
       - "3307:3306"
     volumes:
