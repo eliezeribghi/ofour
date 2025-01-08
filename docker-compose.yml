@@ -1,4 +1,3 @@
-
 services:
   frontend:
     build:
@@ -6,11 +5,11 @@ services:
       dockerfile: frontend/Dockerfile
     ports:
       - "3000:80"
-
     depends_on:
       - backend  # Le frontend dépend du backend
     networks:
       - app_network
+
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -34,8 +33,7 @@ services:
     volumes:
       - ./backend:/var/www 
     ports:
-     -   "${PORT:-8080}:8080"  # Le backend est accessible via http://localhost:8080
- 
+      - "${PORT:-8080}:8080"  # Le backend est accessible via http://localhost:8080
     depends_on:
       - db  # Le backend dépend de la base de données
     networks:
@@ -48,40 +46,41 @@ services:
       DB_DATABASE: ofour
       DB_USERNAME: user
       DB_PASSWORD: user
-      
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+
   composer:
     image: composer:latest
     container_name: composer-installer
     working_dir: /var/www/backend 
     volumes:
-     - ./backend:/var/www/backend
+      - ./backend:/var/www/backend
     command: ["composer", "install"]
+
   db:
-    image: mysql:8.0
+    image: mysql:5.7  # Assurez-vous de spécifier l'image 5.7 pour être cohérent avec l'exemple précédent
     container_name: my-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root  # Mot de passe pour l'utilisateur root
       MYSQL_DATABASE: ofour      # Nom de la base de données à créer
+      MYSQL_USER: user           # Utilisateur MySQL
+      MYSQL_PASSWORD: user       # Mot de passe de l'utilisateur
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Exposer MySQL sur le port 3307 de l'hôte
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - app_network
     command: --lower_case_table_names=2
     healthcheck:
-     test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
-     interval: 30s
-     timeout: 5s
-     retries: 3
-
-
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 networks:
   app_network:
@@ -89,4 +88,3 @@ networks:
 
 volumes:
   mysql_data:
-
