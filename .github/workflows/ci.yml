@@ -26,26 +26,28 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      # Étape 5: Configurer PHP pour le backend
+      # Étape 5: Configurer Node.js pour le backend (si nécessaire, répéter pour backend)
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
          php-version: '8.2.0'
          extensions: mbstring, xml, bcmath, curl, zip
 
-      # Étape 6: Installer Composer pour le backend
+      # Étape 6: Copier le fichier .env dans le dossier backend
+      - name: Copy .env file
+        run: cp /path/to/your/.env ./backend/.env
+
+      # Étape 7: Installer les dépendances du backend
       - name: Install Composer dependencies
         working-directory: ./backend # Dossier du backend
         run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
-      # Étape 7: Générer la clé d'application Laravel (si nécessaire)
-      - name: Generate Laravel application key
+      # Étape 8: Générer la clé d'application
+      - name: Generate APP_KEY
         working-directory: ./backend
         run: php artisan key:generate
 
-      # Étape 8: Exécuter les tests du backend
-      - name: Run backend tests
+      # Étape 9: Tester ou construire le backend
+      - name: Build or Test backend
         working-directory: ./backend
-        run: php artisan test --no-interaction
-
- 
+        run: php artisan test # Ou `npm test` si tu as des tests pour le backend
