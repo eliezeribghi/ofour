@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   frontend:
     build:
@@ -6,71 +8,64 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend  # Le frontend dépend du backend
+      - backend
     networks:
       - app_network
+
 
   nginx:
     image: nginx:alpine
     container_name: nginx
     volumes:
-      - ./frontend:/app  # Serve les fichiers statiques du frontend
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Le fichier de configuration Nginx
-      - ./nginx/ssl:/etc/nginx/ssl  # Volume pour les certificats SSL
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Monte le fichier de config Nginx
+      - ./nginx/ssl:/etc/nginx/ssl                # Monte les certificats SSL
+      - ./frontend/dist:/app/dist                 # Monte les fichiers du frontend
     ports:
-      - "80:80"
-      - "443:443"  # Activer le port HTTPS
+      - "80:80"                                   # Expose le port HTTP
+      - "443:443"                                 # Expose le port HTTPS
     depends_on:
-      - frontend
-      - backend
+      - backend                                   # Assure-toi que le backend démarre avant Nginx
+      - frontend                                  # Assure-toi que le frontend démarre avant Nginx
     networks:
       - app_network
+
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/var/www 
+      - ./backend:/var/www
     ports:
-      - "${PORT:-8080}:8080"  # Le backend est accessible via http://localhost:8080
+      - "8080:8080"
     depends_on:
-      - db  # Le backend dépend de la base de données
+      - db
     networks:
       - app_network
     environment:
-      PORT: 8080
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: ofour
-      DB_USERNAME: user
-      DB_PASSWORD: user
+      DB_USERNAME: appuser
+      DB_PASSWORD: apppassword
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  composer:
-    image: composer:latest
-    container_name: composer-installer
-    working_dir: /var/www/backend 
-    volumes:
-      - ./backend:/var/www/backend
-    command: ["composer", "install"]
-
   db:
     image: mariadb:10.5
     container_name: my-mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root  # Mot de passe pour l'utilisateur root
-      MYSQL_DATABASE: ofour      # Nom de la base de données à créer
-      MYSQL_USER: user           # Utilisateur MySQL
-      MYSQL_PASSWORD: user       # Mot de passe de l'utilisateur
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ofour
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
     ports:
-      - "3307:3306"  # Exposer MySQL sur le port 3307 de l'hôte
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
