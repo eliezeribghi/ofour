@@ -35,7 +35,7 @@ jobs:
 
       # Étape 6: Copier le fichier .env dans le dossier backend
       - name: Copy .env file
-        run: cp /backend/.env ./backend/.env
+        run: cp ./backend/.env ./backend/.env
 
       # Étape 7: Installer les dépendances du backend
       - name: Install Composer dependencies
