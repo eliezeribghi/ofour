@@ -3,13 +3,6 @@
   font-family: "Lato";
 
   src: local("Lato"), 
-       url("/fonts/Lato-Regular.ttf") format("truetype"), // Assure-toi que l'extension est en minuscule
-       url("/fonts/Lato-Bold.ttf") format("truetype");
 
-    /* 
-        On ajoute font-display pour que la police soit toujours visible lors du chargement de page
-        lien : https://developer.chrome.com/docs/lighthouse/performance/font-display/
-      */
-    font-display: swap;
   }
   

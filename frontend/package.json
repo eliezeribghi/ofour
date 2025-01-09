@@ -11,22 +11,21 @@
     "test": "echo 'No tests specified' && exit 0"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.5.3",
-    "@types/estree": "^1.0.5",
-    "husky": "^9.1.5",
-    "is-ci": "^3.0.1",
-    "sass": "^1.83.0",
-    "sass-embedded": "^1.83.0",
-    "svelte": "^4.2.19",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@types/estree": "^1.0.6",
+    "husky": "^9.1.7",
+    "is-ci": "^4.1.0",
+    "sass": "^1.83.1",
+    "sass-embedded": "^1.83.1",
+    "svelte": "^5.17.3",
     "svelte-preprocess": "^6.0.3",
-    "vite": "^4.5.5"
+    "vite": "^6.0.7"
   },
   "dependencies": {
     "package-name": "^0.1.0",
     "svelte-router": "^1.8.1",
-    "svelte-routing": "^2.5.0",
-    "svelte-spa-router": "^4.0.1",
-    "tinro": "^0.6.12"
+    "svelte-routing": "^2.13.0",
+    "svelte-spa-router": "^4.0.1"
   },
   "description": "This template should help get you started developing with Svelte in Vite.",
   "main": "svelte.config.js",

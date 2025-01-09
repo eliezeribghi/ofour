@@ -68,20 +68,18 @@
         <ul class="theme-card__infos-list">
           <li class="theme-card__infos-elt">
             <img src="../public/icons/icons8-horloge-50.png" alt="Temps" />
-            {recette.temps_cuisson} minutes <span />
+            <span>{recette.temps_cuisson} minutes</span>
           </li>
           <li class="theme-card__infos-elt">
             <img src="../public/icons/icons8-marmite-64.png" alt="Capacité" />
             <span>{recette.contenu}</span>
           </li>
           <li class="theme-card__infos-elt">
-            <img
-              src="../public/icons/icons8-dificulty-64.png"
-              alt="difficulte"
-            />
+            <img src="../public/icons/icons8-dificulty-64.png" alt="Difficulté" />
             <span>{recette.niveau_difficulte}</span>
           </li>
         </ul>
+        
       </div>
       <button
         on:click={() => getRecetteDetails(recette.id)}
