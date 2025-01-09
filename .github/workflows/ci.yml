@@ -13,8 +13,8 @@ jobs:
         env:
            MYSQL_ROOT_PASSWORD: eliezeribghi  # Mot de passe pour l'utilisateur root
            MYSQL_DATABASE: ofour      # Nom de la base de données à créer
-           MYSQL_USER: user           # Utilisateur MySQL
-           MYSQL_PASSWORD: user       # Mot de passe de l'utilisateur
+           MYSQL_USER: appuser           # Utilisateur MySQL
+           MYSQL_PASSWORD: appuser       # Mot de passe de l'utilisateur
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
@@ -74,6 +74,6 @@ jobs:
           DB_CONNECTION: mysql
           DB_HOST: mysql  # Utilise le service mysql défini dans le workflow
           DB_PORT: 3306
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ofour
+          DB_USERNAME: appuser
+          DB_PASSWORD: apppassword
