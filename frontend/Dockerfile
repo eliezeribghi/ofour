@@ -20,9 +20,9 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copier les fichiers de build de la première étape
-COPY --from=build /app/public /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Exposer le port 80 pour accéder au frontend
 EXPOSE 80
 # Démarrer l'application 
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]

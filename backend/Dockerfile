@@ -1,11 +1,13 @@
+# Utiliser l'image PHP de base
 FROM php:8.2-fpm
 
 # Installer les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev \
     zip git libonig-dev libzip-dev unzip libxml2-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    procps psmisc && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql mbstring zip
+
 
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -30,4 +32,3 @@ EXPOSE 8080
 
 # Commande par défaut
 CMD ["php-fpm"]
-

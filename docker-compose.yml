@@ -18,7 +18,7 @@ services:
     container_name: nginx
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Monte le fichier de config Nginx
-      - ./nginx/ssl:/etc/nginx/ssl                # Monte les certificats SSL
+      - ./nginx/ssl:/etc/nginx/ssl:ro                # Monte les certificats SSL
       - ./frontend/dist:/app/dist                 # Monte les fichiers du frontend
     ports:
       - "80:80"                                   # Expose le port HTTP
@@ -38,6 +38,7 @@ services:
       - ./backend:/var/www
     ports:
       - "8080:8080"
+      
     depends_on:
       - db
     networks:
