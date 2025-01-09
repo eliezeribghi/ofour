@@ -17,7 +17,7 @@ WORKDIR /var/www
 
 # Copier les fichiers du projet
 COPY . /var/www
-COPY ./.env /var/www/.env
+COPY ./backend/.env /var/www/.env
 
 # Installer les dépendances Laravel
 RUN composer install --no-dev --optimize-autoloader
