@@ -16,7 +16,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /var/www
 
 # Copier les fichiers du projet
-COPY . /var/www
+COPY ./backend /var/www
 COPY ./backend/.env /var/www/.env
 
 # Installer les dépendances Laravel
