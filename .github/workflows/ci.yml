@@ -52,9 +52,9 @@ jobs:
         run: |
           while ! mysqladmin ping -h"mysql" --silent; do
             echo "Waiting for MySQL..."
-            sleep 2
+            sleep 10
           done
-
+          echo "MySQL is ready"
       # Étape 7: Vérifier la connexion à MySQL
       - name: Check MySQL connection
         run: |
