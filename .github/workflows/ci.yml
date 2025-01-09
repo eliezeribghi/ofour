@@ -46,6 +46,8 @@ jobs:
       - name: Generate APP_KEY
         working-directory: ./backend
         run: php artisan key:generate
+      - name: View MySQL logs
+        run: docker logs $(docker ps -q --filter name=mysql)
 
       # Étape 6: Attendre que MySQL soit prêt
       - name: Wait for MySQL to be ready
