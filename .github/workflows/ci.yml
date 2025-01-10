@@ -45,7 +45,7 @@ jobs:
 
       - name: Attente de MySQL
         run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"3307" -u"root" -p"eliezeribghi" --silent; do
+          while ! mysqladmin ping -h"127.0.0.1" -P"3306" -u"root" -p"eliezeribghi" --silent; do
             echo "Attente de MySQL..."
             sleep 5
           done
