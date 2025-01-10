@@ -58,19 +58,26 @@ jobs:
       - name: Configuration de l'application
         working-directory: ./backend
         run: |
-          echo "DB_CONNECTION=mysql" >> .env
-          echo "DB_HOST=127.0.0.1" >> .env
-          echo "DB_PORT=3307" >> .env
-          echo "DB_DATABASE=ofour" >> .env
-          echo "DB_USERNAME=appuser" >> .env
-          echo "DB_PASSWORD=apppassword" >> .env
+           echo "DB_CONNECTION=mysql" >> $GITHUB_ENV
+           echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+           echo "DB_PORT=3306" >> $GITHUB_ENV
+           echo "DB_DATABASE=ofour" >> $GITHUB_ENV
+           echo "DB_USERNAME=root" >> $GITHUB_ENV
+           echo "DB_PASSWORD=eliezeribghi" >> $GITHUB_ENV
+
       - name: Vérification de la connexion MySQL
         run: |
           mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
 
       - name: Run database migrations
-        working-directory: ./backend
-        run: php artisan migrate --force --database=mysql
+        run: php artisan migrate --force
+        env:
+          DB_CONNECTION: ${{ env.DB_CONNECTION }}
+          DB_HOST: ${{ env.DB_HOST }}
+          DB_PORT: ${{ env.DB_PORT }}
+          DB_DATABASE: ${{ env.DB_DATABASE }}
+          DB_USERNAME: ${{ env.DB_USERNAME }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
 
       - name: Run tests
         working-directory: ./backend
