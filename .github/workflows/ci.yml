@@ -67,7 +67,7 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./backend
-        run: php artisan migrate --force --database=mysql --host=127.0.0.1 --port=3307
+        run: php artisan migrate --force --database=mysql
 
       - name: Run tests
         working-directory: ./backend
