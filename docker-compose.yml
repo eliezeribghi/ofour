@@ -58,28 +58,28 @@ services:
       retries: 3
 
   db:
-    image: mysql:8.0
-    container_name: my-mysql
-    restart: always
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_ROOT_PASSWORD: eliezeribghi
-      MYSQL_DATABASE: ofour
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppassword
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - app_network
-    command: --lower_case_table_names=2
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=root"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+   image: mysql:5.7
+   container_name: my-mysql
+   restart: always
+   tty: true
+   environment:
+     MYSQL_ROOT_PASSWORD: eliezeribghi
+     MYSQL_DATABASE: ofour
+     MYSQL_USER: appuser
+     MYSQL_PASSWORD: apppassword
+   ports:
+    - "3307:3306"
+   volumes:
+     - mysql_data:/var/lib/mysql
+     - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
+   networks:
+     - app_network
+   command: --lower_case_table_names=2
+   healthcheck:
+    test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+    interval: 10s
+    timeout: 5s
+    retries: 3
 
 networks:
   app_network:

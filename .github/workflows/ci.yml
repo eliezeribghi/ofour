@@ -10,73 +10,71 @@ jobs:
     services:
       mysql:
         image: mysql:5.7
-      
         env:
-           MYSQL_ROOT_PASSWORD: eliezeribghi  # Mot de passe pour l'utilisateur root
-           MYSQL_DATABASE: ofour      # Nom de la base de données à créer
-           MYSQL_USER: appuser           # Utilisateur MySQL
-           MYSQL_PASSWORD: appuser       # Mot de passe de l'utilisateur
+          MYSQL_ROOT_PASSWORD: eliezeribghi
+          MYSQL_DATABASE: ofour
+          MYSQL_USER: appuser
+          MYSQL_PASSWORD: apppassword
         ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
+          - 3307:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      # Étape 1: Vérifier le code du dépôt
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Étape 2: Configurer PHP et installer les dépendances
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2.0'
           extensions: mbstring, xml, bcmath, curl, zip
 
-      # Étape 3: Copier le fichier .env depuis le secret
       - name: Copy .env file
         run: echo "$MY_ENV_FILE" > ./backend/.env
         env:
           MY_ENV_FILE: ${{ secrets.MY_ENV_FILE }}
 
-      # Étape 4: Installer les dépendances Composer
       - name: Install Composer dependencies
         working-directory: ./backend
         run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
-      # Étape 5: Générer la clé d'application (si nécessaire)
       - name: Generate APP_KEY
         working-directory: ./backend
         run: php artisan key:generate
-      - name: View MySQL logs
-        run: docker logs $(docker ps -q --filter name=mysql)
 
-      # Étape 6: Attendre que MySQL soit prêt
-      - name: Wait for MySQL to be ready
+      - name: Attente de MySQL
         run: |
-          while ! mysqladmin ping -h"mysql" --silent; do
-            echo "Waiting for MySQL..."
-            sleep 10
+          while ! mysqladmin ping -h"127.0.0.1" -P"3307" -u"root" -p"eliezeribghi" --silent; do
+            echo "Attente de MySQL..."
+            sleep 5
           done
-          echo "MySQL is ready"
-      # Étape 7: Vérifier la connexion à MySQL
-      - name: Check MySQL connection
-        run: |
-          echo "Checking MySQL connection..."
-          mysql -h mysql -u ${{ secrets.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} -e 'SHOW DATABASES;'
+          echo "MySQL est prêt !"
 
-      # Étape 8: Exécuter les migrations de la base de données
+      - name: Vérification de la connexion MySQL
+        run: |
+          mysql -h127.0.0.1 -P3307 -uroot -peliezeribghi -e "SHOW DATABASES;"
+
+      - name: Configuration de l'application
+        working-directory: ./backend
+        run: |
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3307" >> .env
+          echo "DB_DATABASE=ofour" >> .env
+          echo "DB_USERNAME=appuser" >> .env
+          echo "DB_PASSWORD=apppassword" >> .env
+
       - name: Run database migrations
         working-directory: ./backend
-        run: php artisan migrate --env=testing
+        run: php artisan migrate --force
 
-      # Étape 9: Lancer les tests
       - name: Run tests
         working-directory: ./backend
-        run: php artisan test --no-interaction
+        run: php artisan test
         env:
           DB_CONNECTION: mysql
-          DB_HOST: mysql  # Utilise le service mysql défini dans le workflow
-          DB_PORT: 3306
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3307
           DB_DATABASE: ofour
           DB_USERNAME: appuser
           DB_PASSWORD: apppassword
