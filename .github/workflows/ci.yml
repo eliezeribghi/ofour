@@ -45,7 +45,7 @@ jobs:
 
       - name: Attente de MySQL
         run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"3306" -u"root" -p"eliezeribghi" --silent; do
+          while ! mysqladmin ping -h"127.0.0.1" -P"3307" -u"root" -p"eliezeribghi" --silent; do
             echo "Attente de MySQL..."
             sleep 5
           done
@@ -53,21 +53,21 @@ jobs:
 
       - name: Vérification de la connexion MySQL
         run: |
-          mysql -h127.0.0.1 -P3306 -uroot -peliezeribghi -e "SHOW DATABASES;"
+          mysql -h127.0.0.1 -P3307-uroot -peliezeribghi -e "SHOW DATABASES;"
 
       - name: Configuration de l'application
         working-directory: ./backend
         run: |
            echo "DB_CONNECTION=mysql" >> $GITHUB_ENV
            echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
-           echo "DB_PORT=3306" >> $GITHUB_ENV
+           echo "DB_PORT=3307" >> $GITHUB_ENV
            echo "DB_DATABASE=ofour" >> $GITHUB_ENV
            echo "DB_USERNAME=root" >> $GITHUB_ENV
            echo "DB_PASSWORD=eliezeribghi" >> $GITHUB_ENV
 
       - name: Vérification de la connexion MySQL
         run: |
-          mysql -h127.0.0.1 -P3306 -uappuser -papppassword -e "SHOW DATABASES;"
+          mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
 
       - name: Vider le cache de configuration
         run: php artisan config:clear
