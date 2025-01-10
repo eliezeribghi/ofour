@@ -18,8 +18,9 @@ jobs:
         ports:
           - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+   
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -66,7 +67,7 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./backend
-        run: php artisan migrate --force
+        run: php artisan migrate --force --database=mysql --host=127.0.0.1 --port=3307
 
       - name: Run tests
         working-directory: ./backend
@@ -78,3 +79,6 @@ jobs:
           DB_DATABASE: ofour
           DB_USERNAME: appuser
           DB_PASSWORD: apppassword
+      - name: Vérification de la connexion MySQL
+        run: |
+          mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
