@@ -68,6 +68,8 @@ jobs:
       - name: Vérification de la connexion MySQL
         run: |
           mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
+      - name: Vider le cache de configuration
+        run: php artisan config:clear
 
       - name: Run database migrations
         run: php artisan migrate --force
