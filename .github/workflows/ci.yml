@@ -64,6 +64,9 @@ jobs:
           echo "DB_DATABASE=ofour" >> .env
           echo "DB_USERNAME=appuser" >> .env
           echo "DB_PASSWORD=apppassword" >> .env
+      - name: Vérification de la connexion MySQL
+        run: |
+          mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
 
       - name: Run database migrations
         working-directory: ./backend
@@ -79,6 +82,4 @@ jobs:
           DB_DATABASE: ofour
           DB_USERNAME: appuser
           DB_PASSWORD: apppassword
-      - name: Vérification de la connexion MySQL
-        run: |
-          mysql -h127.0.0.1 -P3307 -uappuser -papppassword -e "SHOW DATABASES;"
+      
