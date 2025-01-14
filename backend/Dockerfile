@@ -32,3 +32,14 @@ EXPOSE 8080
 
 # Commande par défaut
 CMD ["php-fpm"]
+
+FROM nginx:alpine
+
+# Copiez les fichiers de votre application
+COPY . /usr/share/nginx/html/
+
+# Configurez Nginx pour écouter sur le port défini par l'environnement
+RUN sed -i 's/80/${PORT}/g' /etc/nginx/conf.d/default.conf
+
+# Commande pour démarrer Nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,5 +1,5 @@
 # Étape 1 : Construction de l'application frontend
-FROM node:18 AS build
+FROM node:21.1.0 AS build
 
 # Définir le répertoire de travail
 WORKDIR /app
