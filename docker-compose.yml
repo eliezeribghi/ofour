@@ -21,7 +21,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro                # Monte les certificats SSL
       - ./frontend/dist:/app/dist                 # Monte les fichiers du frontend
     ports:
-      - "80:80"                                   # Expose le port HTTP
+      - PORT=80                                   # Expose le port HTTP
       - "443:443"                                 # Expose le port HTTPS
     depends_on:
       - backend                                   # Assure-toi que le backend démarre avant Nginx
