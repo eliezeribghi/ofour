@@ -22,7 +22,7 @@ services:
       - ./frontend/dist:/app/dist                 # Monte les fichiers du frontend
     ports:
       - PORT=80                                   # Expose le port HTTP
-      - "443:443"                                 # Expose le port HTTPS
+                                   # Expose le port HTTPS
     depends_on:
       - backend                                   # Assure-toi que le backend démarre avant Nginx
       - frontend                                  # Assure-toi que le frontend démarre avant Nginx

@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     procps psmisc && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql mbstring zip
 
-
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -32,14 +31,3 @@ EXPOSE 8080
 
 # Commande par défaut
 CMD ["php-fpm"]
-
-FROM nginx:alpine
-
-# Copiez les fichiers de votre application
-COPY . /usr/share/nginx/html/
-
-# Configurez Nginx pour écouter sur le port défini par l'environnement
-RUN sed -i 's/80/${PORT}/g' /etc/nginx/conf.d/default.conf
-
-# Commande pour démarrer Nginx
-CMD ["nginx", "-g", "daemon off;"]
