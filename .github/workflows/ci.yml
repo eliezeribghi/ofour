@@ -68,6 +68,12 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         run: php artisan test
+      - name: Start SonarQube
+        run: |
+         docker run -d --name sonar \
+         -p 9003:9000 \
+         -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+         sonarqube:lts
 
   sonarqube:
     runs-on: ubuntu-latest
