@@ -1,11 +1,12 @@
 name: CI
 
 on:
-  [push, pull_request]
+  push:
+  pull_request:
 
 jobs:
   build:
-    runs-on:  ubuntu-latest
+    runs-on: ubuntu-latest
 
     services:
       mysql:
@@ -16,8 +17,61 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, bcmath, curl, zip
+
+      - name: Copy .env file
+        run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
+
+      - name: Install Composer dependencies
+        working-directory: ./backend
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Generate APP_KEY
+        working-directory: ./backend
+        run: php artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping -h"mysql" -P"3306" -u"root" -p"eliezeribghi" --silent; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+          echo "MySQL is ready!"
+
+      - name: Configure Laravel environment
+        working-directory: ./backend
+        run: |
+          echo "DB_CONNECTION=mysql" >> $GITHUB_ENV
+          echo "DB_HOST=mysql" >> $GITHUB_ENV
+          echo "DB_PORT=3306" >> $GITHUB_ENV
+          echo "DB_DATABASE=ofour" >> $GITHUB_ENV
+          echo "DB_USERNAME=root" >> $GITHUB_ENV
+          echo "DB_PASSWORD=eliezeribghi" >> $GITHUB_ENV
+
+      - name: Clear Laravel cache
+        working-directory: ./backend
+        run: php artisan config:clear
+
+      - name: Run database migrations
+        working-directory: ./backend
+        run: php artisan migrate --force
+
+      - name: Run tests
+        working-directory: ./backend
+        run: php artisan test
+
   sonarqube:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -31,79 +85,13 @@ jobs:
       - name: Run SonarScanner (Backend)
         run: |
           cd backend
-          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          sonar-scanner \
+            -Dsonar.host.url="http://localhost:9003" \
+            -Dsonar.login="${{ secrets.SONAR_TOKEN }}"
 
       - name: Run SonarScanner (Frontend)
         run: |
           cd frontend
-          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2.0'
-          extensions: mbstring, xml, bcmath, curl, zip
-
-      - name: Copy .env file
-        run: echo "$MY_ENV_FILE" > ./backend/.env
-        env:
-          MY_ENV_FILE: ${{ secrets.MY_ENV_FILE }}
-
-      - name: Install Composer dependencies
-        working-directory: ./backend
-        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
-
-      - name: Generate APP_KEY
-        working-directory: ./backend
-        run: php artisan key:generate
-
-      - name: Attente de MySQL
-        run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"3306" -u"root" -p"eliezeribghi" --silent; do
-            echo "Attente de MySQL..."
-            sleep 5
-          done
-          echo "MySQL est prêt !"
-
-      - name: Vérification de la connexion MySQL
-        run: |
-          mysql -h127.0.0.1 -P3306 -uroot -peliezeribghi -e "SHOW DATABASES;"
-
-      - name: Configuration de l'application
-        working-directory: ./backend
-        run: |
-          echo "DB_CONNECTION=mysql" >> $GITHUB_ENV
-          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
-          echo "DB_PORT=3306" >> $GITHUB_ENV
-          echo "DB_DATABASE=ofour" >> $GITHUB_ENV
-          echo "DB_USERNAME=root" >> $GITHUB_ENV
-          echo "DB_PASSWORD=eliezeribghi" >> $GITHUB_ENV
-
-      - name: Vider le cache de configuration
-        working-directory: ./backend
-        run: php artisan config:clear
-
-      - name: Run database migrations
-        working-directory: ./backend
-        run: php artisan migrate --force
-        env:
-          DB_CONNECTION: ${{ env.DB_CONNECTION }}
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_PORT: ${{ env.DB_PORT }}
-          DB_DATABASE: ${{ env.DB_DATABASE }}
-          DB_USERNAME: ${{ env.DB_USERNAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-
-      - name: Run tests
-        working-directory: ./backend
-        run: php artisan test
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: ofour
-          DB_USERNAME: root
-          DB_PASSWORD: eliezeribghi
+          sonar-scanner \
+            -Dsonar.host.url="http://localhost:9003" \
+            -Dsonar.login="${{ secrets.SONAR_TOKEN }}"
