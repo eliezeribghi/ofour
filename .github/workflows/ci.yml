@@ -16,8 +16,28 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+  sonarqube:
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install SonarScanner
+        run: |
+          curl -Lo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+
+      - name: Run SonarScanner (Backend)
+        run: |
+          cd backend
+          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: Run SonarScanner (Frontend)
+        run: |
+          cd frontend
+          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@v2
 

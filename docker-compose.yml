@@ -1,23 +1,26 @@
 
 
 services:
+  
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    networks:
-      - app_network
-
-
+   platform: linux/amd64
+   build:
+    context: .
+    dockerfile: ./frontend/Dockerfile
+   ports:
+    - "5173:80"  # Ajuste selon ton projet (3000 si besoin)
+   volumes:
+    - ../frontend:/app  # Recharge le code sans rebuild
+   depends_on:
+    - backend
+   networks:
+    - app_network
+   restart: unless-stopped
   nginx:
     image: nginx:alpine
     container_name: nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Monte le fichier de config Nginx
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Monte le fichier de config Nginx
       - ./nginx/ssl:/etc/nginx/ssl:ro                # Monte les certificats SSL
       - ./frontend/dist:/app/dist                 # Monte les fichiers du frontend
     ports:
@@ -31,6 +34,7 @@ services:
 
 
   backend:
+    platform: linux/amd64
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -57,6 +61,7 @@ services:
       retries: 3
 
   db:
+   platform: linux/amd64
    image: mysql:5.7
    container_name: my-mysql
    restart: always
@@ -64,8 +69,6 @@ services:
    environment:
      MYSQL_ROOT_PASSWORD: eliezeribghi
      MYSQL_DATABASE: ofour
-     MYSQL_USER: appuser
-     MYSQL_PASSWORD: apppassword
    ports:
     - "3306:3306"
    volumes:
@@ -75,10 +78,11 @@ services:
      - app_network
    command: --lower_case_table_names=2
    healthcheck:
-    test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+    test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pEliezeribghi"]
     interval: 10s
     timeout: 5s
     retries: 3
+
 
 networks:
   app_network:
