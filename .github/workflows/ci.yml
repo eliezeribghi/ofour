@@ -68,26 +68,26 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         run: php artisan test
-      - name: Start SonarQube
-        run: |
-         docker run -d --name sonar \
-         -p 9003:9000 \
-         -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
-         sonarqube:lts
-
+  
   sonarqube:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
 
       - name: Install SonarScanner
         run: |
           curl -Lo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
           unzip sonar-scanner.zip
           echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
-
+      - name: Start SonarQube
+        run: |
+         docker run -d --name sonar \
+         -p 9003:9000 \
+         -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+         sonarqube:lts
       - name: Run SonarScanner (Backend)
         run: |
           cd backend
