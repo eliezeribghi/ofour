@@ -1,35 +1,47 @@
 # Étape 1 : Construction de l'application frontend
-FROM node:21.1.0 AS build
+FROM node:latest AS build
 
 # Définir le répertoire de travail
 WORKDIR /app
 
 # Copier les fichiers nécessaires pour installer les dépendances
-COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
+
+RUN ls -l /app
+
+
 
 # Installer les dépendances en mode production
 RUN npm install --production
-
+RUN npm install
 # Copier tous les fichiers sources de l'application frontend
-COPY . .
+COPY ./frontend /app/
+
+
 
 # Construire l'application pour la production
 RUN npm run build
 
+
 # Étape 2 : Serveur Nginx pour servir les fichiers statiques
 FROM nginx:alpine
 
-# Copier les fichiers générés par le build de la première étape
-COPY --from=build /app/dist /usr/share/nginx/html/
+# Copier les fichiers générés par le build
+COPY --from=build /dist /usr/share/nginx/html/
 
-# Copier votre fichier de configuration Nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Copier la configuration Nginx (chemin adapté)
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Remplacer la variable ${PORT} par la valeur 80 si aucune variable n'est définie
+# Créer le dossier pour les certificats et copier les fichiers SSL
+RUN mkdir -p /etc/nginx/ssl
+COPY ./nginx/ssl/fullchain.pem /etc/nginx/ssl/fullchain.pem
+COPY ./nginx/ssl/privkey.pem /etc/nginx/ssl/privkey.pem
+
+# Remplacer la variable ${PORT} par 80 si aucune valeur n'est définie
 RUN sed -i 's/\${PORT}/80/g' /etc/nginx/conf.d/default.conf
 
-# Exposer le port 80 pour accéder au frontend
-EXPOSE 80
+# Exposer le port 443 pour HTTPS
+EXPOSE 443
 
 # Commande pour démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]
