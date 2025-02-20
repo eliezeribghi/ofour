@@ -31,7 +31,7 @@ jobs:
       - name: Copy .env file
         run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
       - name: Install Composer dependencies
-        run: cd backend && composer install
+        run: composer install
         working-directory: backend 
 
       - name: Move to Laravel directory
