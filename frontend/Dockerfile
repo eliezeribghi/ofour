@@ -1,47 +1,44 @@
-# Étape 1 : Construction de l'application frontend
+# Étape 1 : Construction du frontend
 FROM node:latest AS build
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires pour installer les dépendances
-COPY frontend/package.json frontend/package-lock.json ./
+# Copier les fichiers package.json et package-lock.json
+COPY ./frontend/package.json ./frontend/package-lock.json ./
 
-RUN ls -l /app
-
-
-
-# Installer les dépendances en mode production
-RUN npm install --production
+# Installer les dépendances
 RUN npm install
-# Copier tous les fichiers sources de l'application frontend
-COPY ./frontend /app/
+
+# Copier le code source du frontend
+COPY ./frontend ./
 
 
-
-# Construire l'application pour la production
+# Construire l'application
 RUN npm run build
-
-
+RUN ls -l /app/src
 # Étape 2 : Serveur Nginx pour servir les fichiers statiques
 FROM nginx:alpine
 
-# Copier les fichiers générés par le build
-COPY --from=build /dist /usr/share/nginx/html/
+# Copier les fichiers générés par le build dans le dossier de Nginx
+COPY --from=build /app/dist /usr/share/nginx/html/
 
-# Copier la configuration Nginx (chemin adapté)
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Copier la configuration Nginx
+COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Créer le dossier pour les certificats et copier les fichiers SSL
+# Créer le dossier pour les certificats SSL et copier les fichiers
 RUN mkdir -p /etc/nginx/ssl
-COPY ./nginx/ssl/fullchain.pem /etc/nginx/ssl/fullchain.pem
-COPY ./nginx/ssl/privkey.pem /etc/nginx/ssl/privkey.pem
+COPY ../nginx/ssl/fullchain.pem /etc/nginx/ssl/fullchain.pem
+COPY ../nginx/ssl/privkey.pem /etc/nginx/ssl/privkey.pem
+
+
+
 
 # Remplacer la variable ${PORT} par 80 si aucune valeur n'est définie
 RUN sed -i 's/\${PORT}/80/g' /etc/nginx/conf.d/default.conf
 
-# Exposer le port 443 pour HTTPS
-EXPOSE 443
+# Exposer les ports 80 et 443
+EXPOSE 80 443
 
-# Commande pour démarrer Nginx
+# Lancer Nginx
 CMD ["nginx", "-g", "daemon off;"]
