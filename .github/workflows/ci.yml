@@ -41,11 +41,15 @@ jobs:
 
       - name: Wait for MySQL
         run: |
-          while ! mysqladmin ping -h"mysql" -P"3306" -u"root" -p"eliezeribghi" --silent; do
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
-          echo "MySQL is ready!"
+         while ! mysqladmin ping -h"192.168.1.247" -P"3306" -u"root" -p"eliezeribghi" --silent; do
+         echo "Waiting for MySQL..."
+         sleep 5
+         done
+         echo "MySQL is ready!"
+      - name: Test MySQL connection
+        run: |
+         mysql -h 127.0.0.1 -u root -p'eliezeribghi' -e "SHOW DATABASES;"
+
 
       - name: Configure Laravel environment
         working-directory: ./backend
