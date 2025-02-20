@@ -30,20 +30,24 @@ jobs:
 
       - name: Copy .env file
         run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
-      - name: Clear Laravel config cache
-        run: php artisan config:clear
+      - name: Move to Laravel directory
+        run: cd backend && php artisan config:clear
+
+
       - name: Test Laravel DB connection
         run: php artisan migrate:status
 
       - name: Install Composer dependencies
         working-directory: ./backend
         run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
       - name: Set Laravel .env DB_HOST
         run: echo "DB_HOST=127.0.0.1" >> .env
 
       - name: Generate APP_KEY
         working-directory: ./backend
         run: php artisan key:generate
+
       - name: Test MySQL connection
         run: |
          mysql -h 127.0.0.1 -u root -p'eliezeribghi' -e "SHOW DATABASES;"
