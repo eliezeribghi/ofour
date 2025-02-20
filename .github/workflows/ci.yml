@@ -38,7 +38,9 @@ jobs:
       - name: Generate APP_KEY
         working-directory: ./backend
         run: php artisan key:generate
-
+      - name: Test MySQL connection
+        run: |
+         mysql -h 127.0.0.1 -u root -p'eliezeribghi' -e "SHOW DATABASES;"
       - name: Wait for MySQL
         run: |
          while ! mysqladmin ping -h"192.168.1.247" -P"3306" -u"root" -p"eliezeribghi" --silent; do
@@ -46,9 +48,7 @@ jobs:
          sleep 5
          done
          echo "MySQL is ready!"
-      - name: Test MySQL connection
-        run: |
-         mysql -h 127.0.0.1 -u root -p'eliezeribghi' -e "SHOW DATABASES;"
+      
 
 
       - name: Configure Laravel environment
