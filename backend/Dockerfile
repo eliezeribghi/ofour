@@ -1,33 +1,41 @@
 # Utiliser l'image PHP de base
 FROM php:8.2-fpm
 
-# Installer les extensions PHP nécessaires
-RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev \
-    zip git libonig-dev libzip-dev unzip libxml2-dev \
-    procps psmisc && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring zip
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Installer les dépendances système et les extensions PHP nécessaires
+
+
+
+# Installation des dépendances et des extensions PHP
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installer Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
 
-# Définir le répertoire de travail
-WORKDIR /var/www
+# Copier les fichiers de l'application dans le conteneur
+COPY . /app
 
-# Copier les fichiers du projet
-COPY . /var/www
-COPY .env /var/www/.env
+# Nettoyer les fichiers temporaires
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Installer les dépendances Laravel
-RUN composer install --no-dev --optimize-autoloader
 
-# Ajuster les permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
 
-# Exposer le port 8080
-EXPOSE 8080
+# Ajouter un script pour vérifier que MySQL est en ligne
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
-# Commande par défaut
-CMD ["php-fpm"]
+# Remplacer la commande par défaut pour inclure le script de vérification
+CMD ["/usr/local/bin/start.sh"]

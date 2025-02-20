@@ -10,7 +10,7 @@ services:
    ports:
     - "5173:80"  # Ajuste selon ton projet (3000 si besoin)
    volumes:
-    - ../frontend:/app  # Recharge le code sans rebuild
+    - ./frontend:/app  # Recharge le code sans rebuild
    depends_on:
     - backend
    networks:
@@ -37,7 +37,7 @@ services:
     platform: linux/amd64
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./backend:/var/www
     ports:
@@ -61,27 +61,45 @@ services:
       retries: 3
 
   db:
-   platform: linux/amd64
-   image: mysql:5.7
-   container_name: my-mysql
-   restart: always
-   tty: true
-   environment:
+    platform: linux/amd64
+    image: mysql:5.7
+    container_name: my-mysql
+    restart: always
+    tty: true
+    environment:
      MYSQL_ROOT_PASSWORD: eliezeribghi
      MYSQL_DATABASE: ofour
-   ports:
+    ports:
     - "3306:3306"
-   volumes:
-     - mysql_data:/var/lib/mysql
-     - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
-   networks:
-     - app_network
-   command: --lower_case_table_names=2
-   healthcheck:
-    test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pEliezeribghi"]
-    interval: 10s
-    timeout: 5s
-    retries: 3
+    volumes:
+    - mysql_data:/var/lib/mysql
+    - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+    - app_network
+    command: --lower_case_table_names=2
+    healthcheck:
+     test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-peliezeribghi"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+
+  # sonarqube:
+  #   image: sonarqube:lts-community
+  #   depends_on:
+  #     - sonar_db
+  #   environment:
+  #     SONAR_JDBC_URL: jdbc:postgresql://sonar_db:5432/sonar
+  #     SONAR_JDBC_USERNAME: sonar
+  #     SONAR_JDBC_PASSWORD: sonar
+  #   ports:
+  #     - "9001:9000"
+  #   volumes:
+  #     - sonarqube_conf:/opt/sonarqube/conf
+  #     - sonarqube_data:/opt/sonarqube/data
+  #     - sonarqube_extensions:/opt/sonarqube/extensions
+  #     - sonarqube_logs:/opt/sonarqube/logs
+  #     - sonarqube_temp:/opt/sonarqube/temp
+
 
 
 networks:
