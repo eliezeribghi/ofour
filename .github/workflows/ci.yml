@@ -31,17 +31,24 @@ jobs:
          registry-url: "https://registry.npmjs.org"
         continue-on-error: false
 
-      - name: Install Docker using Docker's official script
-        run: |
-         curl -fsSL https://get.docker.com -o get-docker.sh
-         sudo sh get-docker.sh
-         
+      - name: Check if Docker is installed
+        run: docker --version
+        continue-on-error: false
 
-      - name: Install Docker Compose
+      - name: Install Docker Compose (if needed)
         run: |
+         if ! [ -x "$(command -v docker-compose)" ]; then
          sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
          sudo chmod +x /usr/local/bin/docker-compose
+         fi
          docker-compose --version
+       
+
+      - name: Start Docker (if needed)
+        run: |
+         sudo systemctl start docker || echo "Docker service already running"
+         sudo docker ps
+         
         
 
       - name: Start docker-compose
