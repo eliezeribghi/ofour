@@ -19,87 +19,37 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v3
-        continue-on-error: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-         node-version: "16"
-         registry-url: "https://registry.npmjs.org"
-        continue-on-error: false
+          node-version: "16"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Check if Docker is installed
         run: docker --version
-        continue-on-error: false
 
       - name: Install Docker Compose (if needed)
         run: |
-         if ! [ -x "$(command -v docker-compose)" ]; then
-         sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-         sudo chmod +x /usr/local/bin/docker-compose
-         fi
-         docker-compose --version
-      
+          if ! [ -x "$(command -v docker-compose)" ]; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+          docker-compose --version
 
-
-      - name: Start Docker (if needed)
-        run: |
-         sudo systemctl start docker || echo "Docker service already running"
-         sudo docker ps
-
-      - name: Check running containers
-        run: docker ps -a
-      - name: Stop and remove existing MySQL container
-        run: |
-         docker stop my-mysql || true
-         docker rm my-mysql || true
-
-      - name: Check running containers
-        run: docker ps -a
-      - name: Stop and remove existing MySQL container
-        run: |
-         docker stop my-mysql || true
-         docker rm my-mysql || true
-      - name: Check if MySQL is running
-        run: sudo lsof -i :3306 || true
-      - name: Stop system MySQL
+      - name: Stop system MySQL (if running)
         run: sudo systemctl stop mysql || true
 
-      - name: Start docker-compose
+      - name: Start MySQL container
         run: |
-         sudo systemctl start docker 
-         sudo docker-compose up -d    
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-         php-version: '8.2'
-         extensions: mbstring, xml, bcmath, curl, zip
-
-
-      - name: Copy .env file
-        run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
-
-      - name: Install Composer dependencies
-        working-directory: ./backend
-        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
-      - name: Test MySQL connection
-        run: mysql -h localhost -u root -p"eliezeribghi" -e "SELECT 1;"
-
-      - name: Set Laravel .env DB_HOST
-        run: echo "DB_HOST=localhost" >> ./backend/.env
-
-      - name: Generate APP_KEY
-        working-directory: ./backend
-        run: php artisan key:generate
+          docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=eliezeribghi -e MYSQL_DATABASE=ofour -p 3306:3306 -d mysql:5.7
 
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
-            if mysql -h localhost -u root -p"eliezeribghi" -e "SELECT 1;" &> /dev/null; then
+            if mysql -h 127.0.0.1 -u root -peliezeribghi -e "SELECT 1;" &> /dev/null; then
               echo "MySQL is ready!"
               exit 0
             fi
@@ -109,14 +59,25 @@ jobs:
           echo "MySQL did not start in time." >&2
           exit 1
 
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, bcmath, curl, zip
 
-      - name: Test MySQL connection
-        run: |
-          mysql -h localhost -u root -p'eliezeribghi' -e "SHOW DATABASES;"
+      - name: Copy .env file
+        run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
 
-      - name: Clear Laravel cache
+      - name: Install Composer dependencies
         working-directory: ./backend
-        run: php artisan config:clear
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Set Laravel .env DB_HOST
+        run: echo "DB_HOST=127.0.0.1" >> ./backend/.env
+
+      - name: Generate APP_KEY
+        working-directory: ./backend
+        run: php artisan key:generate
 
       - name: Run database migrations
         working-directory: ./backend
@@ -146,7 +107,7 @@ jobs:
           -p 9003:9000 \
           -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
           sonarqube:lts
-          sleep 30  # Attente pour que SonarQube démarre
+          sleep 30
 
       - name: Wait for SonarQube
         run: |
