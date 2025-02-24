@@ -48,7 +48,14 @@ jobs:
         run: |
          sudo systemctl start docker || echo "Docker service already running"
          sudo docker ps
-         
+
+      - name: Check running containers
+        run: docker ps -a
+      - name: Stop and remove existing MySQL container
+        run: |
+         docker stop my-mysql || true
+         docker rm my-mysql || true
+
         
 
       - name: Start docker-compose
