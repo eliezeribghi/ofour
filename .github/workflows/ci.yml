@@ -77,7 +77,7 @@ jobs:
         working-directory: ./backend
         run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
       - name: Test MySQL connection
-        run: mysql -h mysql -u root -p"eliezeribghi" -e "SELECT 1;"
+        run: mysql -h 127.0.0.1 -u root -p"eliezeribghi" -e "SELECT 1;"
 
       - name: Set Laravel .env DB_HOST
         run: echo "DB_HOST=127.0.0.1" >> ./backend/.env
