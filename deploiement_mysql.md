@@ -17,7 +17,7 @@ Voici une synthèse détaillée des commandes et étapes que nous avons réalis�
        MYSQL_USER: appuser
        MYSQL_PASSWORD: apppassword
      ports:
-       - "3307:3306"
+       - "3306:3306"
      volumes:
        - mysql_data:/var/lib/mysql
        - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -126,7 +126,7 @@ Voici une synthèse détaillée des commandes et étapes que nous avons réalis�
     Une fois la configuration terminée, teste la connexion à la base de données en utilisant le compte `appuser`. Utilise cette commande :
 
     ```bash
-    mysql -h localhost -P 3307 -u appuser -p
+    mysql -h localhost -P 3306 -u appuser -p
     ```
 
     Tu seras invité à entrer le mot de passe (`apppassword` dans ce cas). Cela te permettra de vérifier si l'utilisateur `appuser` peut bien se connecter à la base de données.
@@ -197,7 +197,7 @@ Voici une synthèse détaillée des commandes et étapes que nous avons réalis�
 
 - **Test de connexion avec `appuser`** :
   ```bash
-  mysql -h localhost -P 3307 -u appuser -p
+  mysql -h localhost -P 3306 -u appuser -p
   ```
 
 - **Redémarrer le conteneur** :
