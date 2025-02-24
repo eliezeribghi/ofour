@@ -80,7 +80,7 @@ jobs:
         run: mysql -h mysql -u root -p"eliezeribghi" -e "SELECT 1;"
 
       - name: Set Laravel .env DB_HOST
-        run: echo "DB_HOST=mysql" >> ./backend/.env
+        run: echo "DB_HOST=127.0.0.1" >> ./backend/.env
 
       - name: Generate APP_KEY
         working-directory: ./backend
