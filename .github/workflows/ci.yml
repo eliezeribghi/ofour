@@ -42,7 +42,8 @@ jobs:
          sudo chmod +x /usr/local/bin/docker-compose
          fi
          docker-compose --version
-       
+      
+
 
       - name: Start Docker (if needed)
         run: |
@@ -56,7 +57,16 @@ jobs:
          docker stop my-mysql || true
          docker rm my-mysql || true
 
-        
+      - name: Check running containers
+        run: docker ps -a
+      - name: Stop and remove existing MySQL container
+        run: |
+         docker stop my-mysql || true
+         docker rm my-mysql || true
+      - name: Check if MySQL is running
+        run: sudo lsof -i :3306 || true
+      - name: Stop system MySQL
+        run: sudo systemctl stop mysql || true
 
       - name: Start docker-compose
         run: |
