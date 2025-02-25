@@ -1,4 +1,4 @@
-#!/Users/eliezeribghi/lib/oracle-cli/bin/python3.13
+#!/Users/root/lib/oracle-cli/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys

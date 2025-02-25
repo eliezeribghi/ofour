@@ -49,11 +49,11 @@ services:
       - app_network
     environment:
       DB_CONNECTION: mysql
-      DB_HOST: db
+      DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_DATABASE: ofour
       DB_USERNAME: root
-      DB_PASSWORD: eliezeribghi
+      DB_PASSWORD: root
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -68,7 +68,7 @@ services:
     restart: always
     tty: true
     environment:
-     MYSQL_ROOT_PASSWORD: eliezeribghi
+     MYSQL_ROOT_PASSWORD: root
      MYSQL_DATABASE: ofour
     ports:
     - "3307:3306"
@@ -79,7 +79,7 @@ services:
     - app_network
     command: --lower_case_table_names=2
     healthcheck:
-     test: ["CMD", "mysqladmin", "ping", "-h", "192.168.1.247", "-uroot", "-peliezeribghi"]
+     test: ["CMD", "mysqladmin", "ping", "-h", "192.168.1.247", "-uroot", "-proot"]
      interval: 10s
      timeout: 5s
      retries: 5

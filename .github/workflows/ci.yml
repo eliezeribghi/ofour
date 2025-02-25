@@ -12,7 +12,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: eliezeribghi
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: ofour
         ports:
           - 3306:3306
@@ -44,12 +44,12 @@ jobs:
 
       - name: Start MySQL container
         run: |
-          docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=eliezeribghi -e MYSQL_DATABASE=ofour -p 3307:3306 -d mysql:5.7
+          docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=ofour -p 3307:3306 -d mysql:5.7
 
       - name: Wait for MySQL
         run: |
           for i in {1..30}; do
-            if mysql -h 127.0.0.1 -u root -peliezeribghi -e "SELECT 1;" &> /dev/null; then
+            if mysql -h 127.0.0.1 -u root -proot -e "SELECT 1;" &> /dev/null; then
               echo "MySQL is ready!"
               exit 0
             fi

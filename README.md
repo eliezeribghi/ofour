@@ -50,7 +50,7 @@ Ofour est une application web de gestion de recettes qui permet aux utilisateurs
 #### 1. Clone le dépôt
 
 ```bash
-git clone https://github.com/eliezeribghi/ofour.git
+git clone https://github.com/root/ofour.git
 cd ofour
 ```
 
