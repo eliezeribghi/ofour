@@ -3,36 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\URL;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\EtapePreparation;
 use App\Models\RecetteIngredient;
 use App\Models\Categorie;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Ingredient; // ✅ Ajout de l'import manquant
+
 class Recette extends Model
 {
     use HasFactory;
-    // Nom de la table dans la base de données associée à ce modèle
+
     protected $table = 'recettes';
 
-    // Relation avec le modèle Ingredients : une recette peut avoir plusieurs ingrédients
+    protected $fillable = [
+        'titre',
+        'categorie_id',
+        'image_url',
+        'contenu',
+        'temps_preparation',
+        'temps_cuisson',
+        'niveau_difficulte',
+        'note_moyenne',
+    ];
+
+  
     public function ingredients()
     {
         return $this->belongsToMany(Ingredient::class, 'recette_ingredients', 'recette_id', 'ingredient_id')
-        ->withPivot('quantite')
-        ->withTimestamps();
+            ->withPivot('quantite')
+            ->withTimestamps();
     }
 
-    // Relation avec le modèle EtapesPreparation : une recette peut avoir plusieurs étapes de préparation
-//     public function etapesPreparation()
-//     {
-//         return $this->hasMany(EtapesPreparation::class, 'recette_id')->orderBy('ordre');
-//     }
-//     public function recette()
-// {
-//     return $this->belongsTo(Recette::class, 'recette_id');
-// }
-public function etapesPreparation()
+    public function etapesPreparation()
     {
         return $this->hasMany(EtapePreparation::class);
     }
@@ -46,6 +48,4 @@ public function etapesPreparation()
     {
         return $this->belongsTo(Categorie::class);
     }
-
 }
-

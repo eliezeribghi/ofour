@@ -4,11 +4,7 @@ FROM php:8.2-fpm
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Installer les dépendances système et les extensions PHP nécessaires
-
-
-
-# Installation des dépendances et des extensions PHP
+# Installation des dépendances système et des extensions PHP
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -17,10 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libzip-dev \
     unzip \
+    mariadb-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd \
+    && docker-php-ext-install gd zip \
+    && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh
 
 # Installer Composer
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
@@ -28,14 +29,10 @@ RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-di
 # Copier les fichiers de l'application dans le conteneur
 COPY . /app
 
-# Nettoyer les fichiers temporaires
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-
 
 # Ajouter un script pour vérifier que MySQL est en ligne
-COPY start.sh /usr/local/bin/start.sh
+COPY ./start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Remplacer la commande par défaut pour inclure le script de vérification
+# Définir la commande par défaut
 CMD ["/usr/local/bin/start.sh"]

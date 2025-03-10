@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Vérifier que MySQL est en ligne
-while ! mysqladmin ping -h"mysql" -P"3306" -u"root" -p"root" --silent; do
+until mysqladmin ping -h"$DB_HOST" --silent; do
     echo "Waiting for MySQL..."
-    sleep 5
+    sleep 2
 done
+
 
 echo "MySQL is ready!"
 php-fpm

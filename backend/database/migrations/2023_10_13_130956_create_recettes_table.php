@@ -13,7 +13,7 @@ class CreateRecettesTable extends Migration
      */
     public function up()
     {
-        
+
         if (!Schema::hasTable('recettes')){
         // Création de la table 'recettes'
         Schema::create('recettes', function (Blueprint $table) {
