@@ -1,6 +1,0 @@
-projectKey=laravel-svelte
-serverUrl=http://localhost:9003
-serverVersion=25.2.0.102705
-dashboardUrl=http://localhost:9003/dashboard?id=laravel-svelte
-ceTaskId=a182824d-e0f0-418d-adcd-3224f8508553
-ceTaskUrl=http://localhost:9003/api/ce/task?id=a182824d-e0f0-418d-adcd-3224f8508553
