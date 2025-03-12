@@ -20,5 +20,11 @@ export default defineConfig({
       },
     },
   },
-  plugins: [svelte()]
+  plugins: [svelte()],
+  server: {
+    host: true,
+    watch: {
+      usePolling: true,
+    }
+  }
 });
