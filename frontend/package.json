@@ -28,7 +28,8 @@
     "svelte-spa-router": "^4.0.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.9.5"
+    "@rollup/rollup-linux-arm64-gnu": "latest"
+   
   },
   "description": "This template should help get you started developing with Svelte in Vite.",
   "main": "svelte.config.js",

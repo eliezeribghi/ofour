@@ -1,132 +1,286 @@
-name: CI
+name: Laravel CI
 
 on:
+  workflow_dispatch:
+    inputs:
+      environnement:
+        description: 'Choisir l’environnement'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: 'Version à déployer'
+        required: false
   push:
+    branches: [master, github-action]
+    tags: ['v*.*.*']
   pull_request:
+    branches: [master, github-action]
 
 jobs:
-  build:
+  laravel-tests:
+    name: Run Laravel Tests in Docker
     runs-on: ubuntu-latest
+    environment: firsttodo-list
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: ofour
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: todolist
+      DB_USERNAME: user_dbb
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      MYSQL_DATABASE: todolist
+      MYSQL_USER: user_dbb
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      ADMINER_DEFAULT_SERVER: mysql
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Check if Docker is installed
-        run: docker --version
-
-      - name: Install Docker Compose (if needed)
+      - name: Afficher les paramètres de déploiement
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          if ! [ -x "$(command -v docker-compose)" ]; then
-            sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-          fi
+          echo "Déploiement sur ${{ github.event.inputs.environnement }}"
+          echo "Version : ${{ github.event.inputs.version || 'non spécifiée' }}"
+
+      - name: 🛎 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📝 Adjust backend directory permissions
+        run: chmod -R u+w backend
+
+      - name: 🐳 Setup Docker Compose
+        run: |
+          echo "Installing Docker Compose..."
+          sudo rm -f /usr/local/bin/docker-compose
+          curl -L "https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Stop system MySQL (if running)
-        run: sudo systemctl stop mysql || true
-
-      - name: Start MySQL container
+      - name: 🛠 Install yq for YAML parsing
         run: |
-          docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=ofour -p 3307:3306 -d mysql:5.7
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+          yq --version
 
-      - name: Wait for MySQL
+      - name: 📄 Display docker-compose.yml
+        run: cat docker-compose.yml
+
+      - name: 🔍 Debug docker-compose config
         run: |
-          for i in {1..30}; do
-            if mysql -h 127.0.0.1 -u root -proot -e "SELECT 1;" &> /dev/null; then
-              echo "MySQL is ready!"
-              exit 0
-            fi
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
-          echo "MySQL did not start in time." >&2
-          exit 1
+          echo "Docker Compose config output:"
+          docker-compose config
+          echo "Checking backend service definition:"
+          docker-compose config | yq e '.services.backend' -
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - name: 🔍 Debug secrets before creating .env
+        run: |
+          echo "DB_PASSWORD is set to: ${{ secrets.DB_PASSWORD || 'NOT_SET' }}"
+          echo "MYSQL_ROOT_PASSWORD is set to: ${{ secrets.MYSQL_ROOT_PASSWORD || 'NOT_SET' }}"
+          echo "MYSQL_PASSWORD is set to: ${{ secrets.MYSQL_PASSWORD || 'NOT_SET' }}"
+          echo "SLACK_BOT_TOKEN is set to: ${{ secrets.SLACK_BOT_TOKEN || 'NOT_SET' }}"
+
+      - name: 📄 Create .env file
+        run: |
+          {
+            echo "APP_NAME=Laravel"
+            echo "APP_ENV=local"
+            echo "APP_KEY="
+            echo "APP_DEBUG=true"
+            echo "APP_URL=http://localhost:8000"
+            echo "DB_CONNECTION=mysql"
+            echo "DB_HOST=${{ env.DB_HOST }}"
+            echo "DB_PORT=${{ env.DB_PORT }}"
+            echo "DB_DATABASE=${{ env.DB_DATABASE }}"
+            echo "DB_USERNAME=${{ env.DB_USERNAME }}"
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}"
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
+            echo "MYSQL_DATABASE=${{ env.MYSQL_DATABASE }}"
+            echo "MYSQL_USER=${{ env.MYSQL_USER }}"
+            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
+            echo "ADMINER_DEFAULT_SERVER=${{ env.ADMINER_DEFAULT_SERVER }}"
+            echo "BROADCAST_DRIVER=log"
+            echo "CACHE_DRIVER=file"
+            echo "FILESYSTEM_DRIVER=local"
+            echo "QUEUE_CONNECTION=sync"
+            echo "SESSION_DRIVER=file"
+            echo "SESSION_LIFETIME=120"
+            echo "REDIS_HOST=127.0.0.1"
+            echo "REDIS_PASSWORD=null"
+            echo "REDIS_PORT=6379"
+            echo "MAIL_MAILER=smtp"
+            echo "MAIL_HOST=mailhog"
+            echo "MAIL_PORT=1025"
+            echo "MAIL_USERNAME=null"
+            echo "MAIL_PASSWORD=null"
+            echo "MAIL_ENCRYPTION=null"
+            echo "MAIL_FROM_ADDRESS=null"
+            echo "MAIL_FROM_NAME=\"Laravel\""
+          } > .env
+          cat .env
+
+      - name: 🔍 Check system memory
+        run: |
+          echo "Available memory before starting containers:"
+          free -m
+          docker stats --no-stream
+
+      - name: 💾 Cache Composer dependencies
+        uses: actions/cache@v3
         with:
-          php-version: '8.2'
-          extensions: mbstring, xml, bcmath, curl, zip
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-      - name: Copy .env file
-        run: printf "%s" "${{ secrets.MY_ENV_FILE }}" > ./backend/.env
-
-      - name: Install Composer dependencies
-        working-directory: ./backend
-        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
-
-      - name: Set Laravel .env DB_HOST
-        run: echo "DB_HOST=127.0.0.1" >> ./backend/.env
-
-      - name: Generate APP_KEY
-        working-directory: ./backend
-        run: php artisan key:generate
-
-      # - name: Run database migrations
-      #   working-directory: ./backend
-      #   run: php artisan migrate --force
-
-      - name: Run tests
-        working-directory: ./backend
-        run: php artisan test
-
-  sonarqube:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install SonarScanner
+      - name: 🚀 Build and start MySQL only
         run: |
-          curl -Lo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-          unzip sonar-scanner.zip
-          echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+          echo "Starting MySQL with Docker Compose..."
+          docker-compose up -d --build mysql
+          echo "Listing containers..."
+          docker-compose ps
 
-      - name: Start SonarQube
-        run: |
-          docker run -d --name sonar \
-          -p 9003:9000 \
-          -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
-          sonarqube:lts
-          sleep 30
+      - name: 📝 Show MySQL logs immediately
+        if: always()
+        run: docker-compose logs mysql
 
-      - name: Wait for SonarQube
+      - name: 🔍 Check MySQL container environment variables
+        run: docker-compose exec -T mysql env || echo "Failed to access MySQL container environment"
+
+      - name: ⏳ Wait for MySQL to be fully ready
         run: |
-          until curl -s http://localhost:9003/api/system/status | grep -q "OK"; do
-            echo "Waiting for SonarQube..."
-            sleep 5
+          echo "Waiting for MySQL to be ready..."
+          for i in {1..60}; do
+            if docker-compose exec -T mysql mysqladmin ping -h mysql -u ${{ env.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} --silent; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "Waiting for MySQL... ($i/60)"
+            docker-compose ps
+            sleep 2
           done
-          echo "SonarQube is ready!"
+          if ! docker-compose exec -T mysql mysqladmin ping -h mysql -u ${{ env.DB_USERNAME }} -p${{ secrets.DB_PASSWORD }} --silent; then
+            echo "MySQL failed to start"
+            docker-compose logs mysql
+            exit 1
+          fi
 
-      - name: Run SonarScanner (Backend)
-        working-directory: ./backend
+      - name: 📦 Build backend image
         run: |
-          sonar-scanner \
-            -Dsonar.host.url="http://localhost:9003" \
-            -Dsonar.login="${{ secrets.SONAR_TOKEN }}"
+          echo "Building backend image..."
+          docker-compose build --no-cache backend
+          echo "Backend image built."
+          echo "Listing built images..."
+          docker images | grep backend || echo "No backend images found"
 
-      - name: Run SonarScanner (Frontend)
-        working-directory: ./frontend
+      - name: 📦 Install Composer dependencies in temporary container
         run: |
-          sonar-scanner \
-            -Dsonar.host.url="http://localhost:9003" \
-            -Dsonar.login="${{ secrets.SONAR_TOKEN }}"
+          echo "Installing Composer dependencies in temporary container..."
+          # Tenter de récupérer l'image définie explicitement
+          BACKEND_IMAGE=$(docker-compose config | yq e '.services.backend.image // ""' -)
+          if [ -z "$BACKEND_IMAGE" ]; then
+            echo "No explicit image defined, using default build image..."
+            # Récupérer le nom du projet depuis docker-compose
+            PROJECT_NAME=$(docker-compose config | yq e '.name // "first-todo-list"' - | tr '[:upper:]' '[:lower:]')
+            BACKEND_IMAGE="${PROJECT_NAME}_backend"
+            echo "Attempting to find image: $BACKEND_IMAGE"
+            if ! docker images | grep -q "$BACKEND_IMAGE"; then
+              echo "Error: Backend image $BACKEND_IMAGE not found"
+              docker images
+              exit 1
+            fi
+          fi
+          echo "Using backend image: $BACKEND_IMAGE"
+          docker run --rm -v $(pwd)/backend:/app $BACKEND_IMAGE bash -c "cd /app && composer --version && export COMPOSER_MEMORY_LIMIT=-1 && composer install --no-dev --no-plugins --prefer-dist --optimize-autoloader"
+          echo "Composer dependencies installed."
+
+      - name: 📝 Setup Laravel storage and cache directories
+        run: |
+          echo "Setting up Laravel storage and cache directories..."
+          BACKEND_IMAGE=$(docker-compose config | yq e '.services.backend.image // ""' -)
+          if [ -z "$BACKEND_IMAGE" ]; then
+            PROJECT_NAME=$(docker-compose config | yq e '.name // "first-todo-list"' - | tr '[:upper:]' '[:lower:]')
+            BACKEND_IMAGE="${PROJECT_NAME}_backend"
+          fi
+          docker run --rm -v $(pwd)/backend:/app $BACKEND_IMAGE bash -c "cd /app && mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache bootstrap/cache && chmod -R 775 storage bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache || true"
+          echo "Directories set up."
+
+      - name: 🚀 Start backend container only
+        run: |
+          echo "Starting backend container..."
+          docker-compose up -d --build backend
+          echo "Listing containers..."
+          docker-compose ps
+
+      - name: 📝 Show backend logs immediately
+        if: always()
+        run: docker-compose logs backend
+
+      - name: ⏳ Wait for backend to be stable
+        run: |
+          echo "Waiting for backend to be stable..."
+          for i in {1..30}; do
+            if docker ps --filter "name=backend_container" --filter "status=running" -q; then
+              echo "Backend is running!"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            docker-compose ps
+            sleep 2
+          done
+          if ! docker ps --filter "name=backend_container" --filter "status=running" -q; then
+            echo "Backend failed to start"
+            docker-compose logs backend
+            exit 1
+          fi
+
+      - name: 🔑 Generate application key
+        run: docker-compose exec -T backend php artisan key:generate
+
+      - name: 🔄 Cache configuration and routes
+        run: |
+          docker-compose exec -T backend php artisan config:cache
+          docker-compose exec -T backend php artisan route:cache
+
+      - name: 🔄 Run migrations
+        run: docker-compose exec -T backend php artisan migrate --force
+
+      - name: 🚀 Start remaining containers
+        run: |
+          echo "Starting remaining containers..."
+          docker-compose up -d --build
+          echo "Listing containers..."
+          docker-compose ps
+
+      - name: ✅ Run PHPUnit tests
+        run: docker-compose exec -T backend php artisan test
+
+      - name: 📜 Show logs if tests fail
+        if: failure()
+        run: docker-compose logs
+
+      - name: 🛑 Stop containers
+        if: always()
+        run: docker-compose down --volumes --remove-orphans
+
+      # - name: 📢 Notify Slack on failure
+      #   if: failure() && github.event_name != 'workflow_dispatch' && env.SLACK_BOT_TOKEN != ''
+      #   uses: slackapi/slack-github-action@v1.27.0
+      #   env:
+      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      #   with:
+      #     channel-id: C07XYZ123 # Remplacer par l'ID correct du canal Slack
+      #     slack-message: |
+      #       ❌ Laravel CI failed for *${{ github.repository }}*
+      #       Ref: `${{ github.ref }}`
+      #       Author: `${{ github.actor }}`
+      #       Commit: `${{ github.sha }}`
+      #       URL: `<${{ github.event.repository.html_url }}/commit/${{ github.sha }}|View Commit>`
+      #       Repository: `<${{ github.event.repository.html_url }}|${{ github.event.repository.name }}>`
+      #       Branch: `${{ github.ref }}`
+      #       Commit Message: `${{ github.event.head_commit.message || 'N/A' }}`
+      #       Commit Author: `${{ github.event.head_commit.author.name || github.actor }}`
+      #       Commit Author Email: ${{ github.event.head_commit.author.email || 'N/A' }}`
